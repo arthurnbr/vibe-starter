@@ -11,14 +11,17 @@ This block is written and re-added by `next dev` — verify at `node_modules/nex
 # Project
 
 Interview starter: Next.js 16 full-stack app (one process, SQLite file). You get a brief and ~40 minutes.
-**The goal is a product that impresses in a demo**: the brief is the floor, not the ceiling. Two pages with
-four interactions is a fail, even if clean. Ship the brief fast, then stack features that make the reviewer
-say "wow" (see `.agents/skills/wow-features`). Quality comes from the few hard rules below, not from doing less.
+**The goal is a tool that does real work for its users**, demoed as their day. The brief describes data;
+do not mirror it as "one table + one form per entity". Design from the users' jobs: batch where reality is batch,
+reconcile expected vs actual, compute decisions with a one-click action, model the documents the job implies
+(order, count, return). See `kickoff` and `workflow-screens`. Polish (palette, shortcuts, dark mode) is already
+in the shell and is never a backlog item. Quality comes from the hard rules below.
 
 ## Pace
 
 - Work autonomously: decide, note the assumption in `SPEC.md`, keep going. Never stop to ask.
-- Brief MUSTs done in the first ~40% of the time, as vertical slices. Then wow features, one slice at a time.
+- `kickoff` (SPEC) in ≤ 6 min. Brief lines are folded into workflows; build workflows first, single-record CRUD
+  only as fallback. Aim for 3–4 workflows that each save a persona real minutes or prevent a real mistake.
 - Use subagents/parallel work for independent slices when available (one owner per file).
 - `npm run check` after each slice; commit after each slice so a broken step never costs the demo.
 - At the end, stop any dev server you started and leave `npm run db:reset` state in place (the demo restarts the server).
@@ -51,6 +54,8 @@ src/features/<x>/validation.ts  zod input schema + URL filter schema (shared fro
 src/features/<x>/queries.ts     "server-only" reads (Drizzle), called from server pages
 src/features/<x>/actions.ts     "use server" mutations: safeParse → db → revalidatePath → ActionState
 src/features/<x>/*.tsx          UI: form dialog (useActionState), table, filters (URL params), chart
+src/features/tasks/task-batch-sheet.tsx + batch*.ts  reference batch screen: lines in client state, typed payload,
+                                one transaction, per-line errors. Copy it for any multi-line workflow.
 src/app/<route>/page.tsx        async server page: parse searchParams with zod, call queries, render
 src/lib/nav.ts                  one line per page → sidebar + palette + "g <key>" shortcut
 src/lib/search.ts               one block per entity → global search in the palette
@@ -81,9 +86,9 @@ src/app/about/page.tsx          methodology page: fill STACK/CHOICES/LIMITS at t
 
 ## Skills (`.agents/skills`)
 
-- `kickoff`: brief → `SPEC.md` = data model + invariants + **feature backlog** (brief MUSTs + 10–15 wow features ranked) + demo storyline.
+- `kickoff`: brief → `SPEC.md` = a day in the life, pains → workflows, decisions the app makes, brief coverage, model, demo storyline.
+- `workflow-screens`: batch entry, expected vs actual, lifecycle documents, today/inbox, trusted recommendations.
 - `ship-feature`: implement one vertical slice following `src/features/tasks`.
-- `wow-features`: catalogue of high-impact features and how to build each in this stack.
 - `data-integrity`: transactions, invariants, history, undo.
 - `demo-ready`: final pass, `/about`, `DEMO.md`.
 - `shadcn`: component usage.
