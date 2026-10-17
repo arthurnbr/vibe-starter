@@ -46,6 +46,9 @@ Keep it if you can write: "<persona> at <moment> no longer has to <pain>, the ap
 
 - **MUST**: every line of the brief, folded into the workflows above when possible (e.g. "record an exit" is
   covered by the end-of-day sales sheet; single-movement entry stays as a fallback).
+- **Do not reject an implied lifecycle document "for time"**: a recent agent ships the brief in ~12 min. Budget for
+  4–5 workflows including at least one document the job implies but the brief does not name (purchase order with
+  supplier, inventory session, return). Plan it as phase 2, after the brief workflows are committed.
 - **Data model** that the workflows need (suppliers, orders, order lines, counts…), money in cents, constraints.
 - **Invariants**: rule → where enforced.
 - **Seed** that makes each workflow meaningful (an order awaiting delivery, a delivery with missing lines,

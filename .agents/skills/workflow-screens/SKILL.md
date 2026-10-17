@@ -22,7 +22,9 @@ A workflow screen matches one real task end to end. Build it as one vertical sli
 ### 2. Expected vs actual (receive an order, inventory count, cash-up)
 - Pre-fill "expected" from the system (order lines, current stock); the user types "actual" only where it differs
   ("Tout reçu" button fills actual = expected).
-- Show the gap per line with color and a reason select when gap ≠ 0 (cassé, manquant, erreur fournisseur, vol).
+- Show the gap per line with color and a **required** reason select when gap ≠ 0 (cassé, manquant, erreur fournisseur,
+  vol, erreur de saisie). The reason is the information the owner needs later ("why do I lose stock?"): surface it
+  in a breakdown (losses by reason / category over the period).
 - Validation writes the adjustments as movements with the reason, and updates the document status
   (partially received, received). Remaining quantities stay open for a later delivery.
 
@@ -37,6 +39,8 @@ A workflow screen matches one real task end to end. Build it as one vertical sli
   "Commander 24 chez Vaude (rupture prévue samedi)", "Réceptionner la commande #12 (attendue hier)",
   "Compter le rayon Chaussures (pas compté depuis 45 j)", "Solder 5 produits dormants (0 vente en 90 j)".
 - Group by urgency (aujourd'hui / cette semaine), show counts. KPIs move to a secondary place.
+- Look beyond stock-outs: dormant items (cash tied up, suggest a markdown), overdue documents, unusual losses,
+  items never counted. Each one is a decision the user would not see in a spreadsheet.
 
 ### 5. Recommendations with numbers the user trusts
 - Show the formula in a tooltip/hover card: "vend 2,3/j sur 30 j · livraison en 5 j · stock 6 → rupture le 21/10".

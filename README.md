@@ -2,30 +2,32 @@
 
 Repo de départ pour une épreuve de **vibe coding chronométrée** (≈40 min, app web full stack, IA autorisée).
 
-Parti pris : **le sujet est un plancher, pas un plafond.** Un agent récent livre le cahier des charges d'un
-CRUD en une dizaine de minutes ; deux pages et quatre interactions, n'importe quel dev le fait à la main.
-Ce qui distingue en démo, c'est un produit qui ressemble à un vrai outil : beaucoup de fonctionnalités utiles,
-qui calculent ce que le tableur ne montre pas, sur des données cohérentes. Le repo est réglé pour ça.
+Parti pris : **le sujet décrit des données ; le candidat doit livrer un outil.** Un agent récent livre le cahier
+des charges d'un CRUD en une douzaine de minutes. Ce qui distingue en démo, ce n'est ni le nombre d'écrans ni le
+vernis (palette, thème sombre) : ce sont des écrans **en forme de tâche** qui font gagner du temps ou évitent une
+erreur à l'utilisateur, sur des données cohérentes. Le repo est réglé pour ça.
 
-## Ce qu'on a appris (3 essais sur le même sujet)
+## Ce qu'on a appris (4 essais sur le même sujet, même prompt de 3 lignes à partir du run 2)
 
-| Essai | Config | Temps agent | Résultat |
-|---|---|---|---|
-| foodmart-bi (référence d'Arthur) | omp + Opus, sans starter ni skills, consigne « bluffe-moi » | — | 6 vues, palette Ctrl K, carte, drill-down, vues enregistrées, visite guidée, page méthodologie. Effet wow. |
-| Stockly run 1 | starter sobre + skills « minimalistes » (ponytail, karpathy) | 9 min 30 | Cahier des charges + bonus, code propre, mais **3 pages basiques** : rien qu'on ne ferait pas à la main. |
-| Stockly run 2 | ce repo (shell riche + `wow-features`) | 14 min 30 | Cahier des charges + bonus + **prévision de rupture, page réassort avec quantités suggérées et réception en un clic, KPI cliquables avec variation vs période précédente, graphique 7/30/90 j cliquable, journal filtrable, courbe de stock 90 j par produit, Ctrl K, raccourcis, thème sombre, page méthodologie**. Même rigueur sur les données (transaction, contrainte `CHECK`, SKU unique, annulation non rejouable). |
+| Essai | Config | Temps | Résultat | Critique |
+|---|---|---|---|---|
+| foodmart-bi (référence d'Arthur) | omp + Opus, sans starter, « bluffe-moi » | — | 6 vues analytiques, carte, drill-down, vues enregistrées, visite guidée. | Effet wow par le volume ; sujet de BI, donc lecture seule. |
+| Run 1 | starter sobre + skills « minimalistes » (ponytail, karpathy) | 9 min 30 | Cahier des charges + bonus, code propre. | **3 pages basiques**, rien qu'on ne ferait pas à la main. |
+| Run 2 | shell riche + skill `wow-features` | 14 min 30 | + prévision de rupture, réassort, KPI avec variation, journal, courbe 90 j, Ctrl K. | Propre, mais **les écrans restent des listes + un formulaire avec les champs de la table** : un carnet de notes enrichi, des features « pour faire wow ». |
+| Run 3 | `kickoff` = journée de l'utilisateur → workflows ; skill `workflow-screens` ; écran de saisie multi-lignes de référence | 13 min 30 | **Accueil « À traiter »** (produits classés par jours de stock restants, bouton Réassort) · **Réassort** (couverture en jours, quantité suggérée modifiable, formule au survol) → **réception pré-remplie** de 11 lignes, enregistrée en une transaction · **Saisie du soir** multi-lignes avec stock après et survente bloquée sur la ligne · **Inventaire attendu / compté** par rayon, « Tout conforme », seuls les écarts génèrent des ajustements, comptage refusé si le stock a bougé pendant le comptage. | Les écrans suivent le métier. Reste : écarts sans motif obligatoire, pas de commande fournisseur (rejetée « faute de temps » alors qu'il restait 26 min), accueil limité aux ruptures. **Corrigé dans les skills** pour le prochain essai. |
 
 Conclusions :
-1. **Les skills de sobriété (« le plus petit changement ») sont un contresens ici.** Ils sont faits pour
-   modifier un gros codebase existant sans casse ; sur un greenfield de 40 min, ils brident l'agent sur le périmètre.
-   Retirés. La propreté vient de règles dures ciblées (validation serveur, transactions, contraintes), pas de « faire moins ».
-2. **L'agent ne dépasse le sujet que si on le lui demande explicitement**, avec un catalogue d'idées concrètes
-   (`wow-features`) et un objectif de démo. Sans ça, il s'arrête au cahier des charges.
-3. **Le prompt du candidat peut rester court** si `AGENTS.md` et les skills portent la méthode. Run 2 = 3 lignes de prompt.
-4. **Le shell compte double** : palette, raccourcis, thème sombre et page méthodologie sont déjà câblés,
-   l'agent n'a qu'à ajouter une ligne par page/entité. 0 minute dépensée dessus pendant l'épreuve.
-5. **Le temps restant est la vraie marge** : 14 min sur 40. Le candidat peut relancer un `wow` de plus, ou passer
-   ces minutes à relire, vérifier et répéter la démo : c'est là que se jouent « usage critique de l'IA » et « qualité de la démo ».
+1. **Concevoir à partir des données donne un carnet de notes**, même avec beaucoup de features. Le levier qui a
+   changé la nature du résultat : faire écrire à l'agent la **journée de l'utilisateur** (moment, ce qu'il a en main,
+   ce qui est pénible aujourd'hui) avant toute feature, et rejeter toute feature « liste + formulaire des champs de la table ».
+2. **Donner un écran de référence non-CRUD** (saisie multi-lignes en une transaction) : l'agent recopie les
+   patterns qu'il voit. Sans exemple, il retombe sur le dialogue un-enregistrement.
+3. **Le vernis n'est pas une feature.** Palette, raccourcis, thème : déjà dans le shell, jamais dans le backlog.
+4. **Les skills de sobriété (ponytail, karpathy) brident un greenfield de 40 min** ; la propreté vient de règles
+   dures (validation serveur, transactions, contraintes), qui ont tenu sur les 3 runs.
+5. **Le prompt du candidat reste court** (3 lignes) : la méthode est dans `AGENTS.md` et les skills.
+6. **L'agent sous-estime le temps disponible** : il coupe « par prudence » ce qui ferait la différence. Le
+   `kickoff` exige désormais 4–5 workflows dont un document implicite (commande fournisseur, inventaire, retour).
 
 ## Ce qu'il y a dedans
 
@@ -38,8 +40,8 @@ Conclusions :
 | **Shell applicatif** | `src/components/app-shell.tsx`, `app-sidebar.tsx`, `command-palette.tsx` | Sidebar repliable, palette **Ctrl K** (recherche globale + actions + navigation), raccourcis `g <lettre>` et `n`, thème sombre, toasts. |
 | Points d'extension | `src/lib/nav.ts`, `src/lib/search.ts`, `ACTIONS` | Une ligne par page / entité / action → sidebar, palette et raccourcis à jour. |
 | Page méthodologie | `src/app/about/page.tsx` | Stack + alternatives écartées, choix, limites : à remplir en fin d'épreuve, sert de support à « expliquez vos choix ». |
-| **Feature de référence `tasks`** | `src/features/tasks` | CRUD complet : liste filtrée dans l'URL, dialog validé serveur (valeurs conservées en cas d'erreur), KPI et graphique cliquables qui ouvrent la liste filtrée. L'agent recopie ce modèle. |
-| `AGENTS.md` | racine | Objectif « démo qui impressionne », rythme, architecture, règles dures, définition de « terminé ». |
+| **Feature de référence `tasks`** | `src/features/tasks` | CRUD complet (liste filtrée dans l'URL, dialog validé serveur, KPI et graphique cliquables) **et un écran de saisie multi-lignes** (`/tasks/batch`) : lignes en état client, payload typé, une transaction, erreurs par ligne. L'agent recopie ces modèles. |
+| `AGENTS.md` | racine | Objectif « un outil qui travaille pour l'utilisateur », rythme, architecture, règles dures, définition de « terminé ». |
 | Skills | `.agents/skills` | Détectés par Codex (`.agents/skills`) et omp. |
 | Sujet | `subjects/stockly.md` | Gestion de stock. |
 
@@ -47,8 +49,8 @@ Conclusions :
 
 | Skill | Rôle |
 |---|---|
-| `kickoff` | Sujet → `SPEC.md` : personas et leurs questions, modèle, invariants, **backlog MUST + 10–15 WOW classés**, plan de seed, scénario de démo. N'attend pas de validation. |
-| `wow-features` | Catalogue : KPI avec variation, drill-down, prévisions, classements, anomalies, suggestions, sparklines, tiroir détail, édition inline, actions groupées, vues enregistrées, journal d'activité, undo, import/export CSV, rapport imprimable, kanban, carte… avec la façon de les faire dans cette stack. |
+| `kickoff` | Sujet → `SPEC.md` : **journée de l'utilisateur** (moments, ce qu'il a en main, douleurs) → workflows, décisions calculées pour lui, test de rejet des features « carnet de notes », couverture du sujet, modèle, scénario de démo = sa journée. |
+| `workflow-screens` | Patterns d'écrans en forme de tâche : saisie multi-lignes, attendu vs réel avec motif d'écart, documents à cycle de vie (commande, inventaire, retour), page « À traiter » avec actions, recommandations explicables, valeurs par défaut et garde-fous. |
 | `ship-feature` | Une tranche verticale : schéma → validation → requêtes → actions → UI → nav/palette → seed → vérif → commit. |
 | `data-integrity` | Transactions, invariants, historique append-only, annulation. |
 | `demo-ready` | Reset, checks, remplissage de `/about`, `DEMO.md` scénarisé. |
@@ -64,7 +66,7 @@ npm install
 npm run db:reset      # crée data/app.db et injecte les données de démo
 npm run check         # typecheck + lint
 npm run dev           # http://localhost:3000 — tester Ctrl K, g t, n, le thème
-codex                 # /skills doit lister kickoff, wow-features, ship-feature…
+codex                 # /skills doit lister kickoff, workflow-screens, ship-feature…
 ```
 
 <details>
@@ -117,9 +119,9 @@ AGENTS.md et les skills de .agents/skills. Travaille en autonomie complète.
 
 | Minutes | Candidat | Agent |
 |---|---|---|
-| 0–3 | Lit le sujet à voix haute, annonce la méthode (spec → tranches → wow → démo). | `kickoff` : `SPEC.md` avec backlog WOW. |
-| 3–5 | Relit `SPEC.md` à l'écran, commente 2–3 choix (invariants, features retenues). Corrige si besoin. | Démarre la tranche 1. |
-| 5–25 | Suit les commits, ouvre l'app après chaque tranche, verbalise ce qu'il vérifie, interrompt si l'agent boucle. | MUST puis WOW, une tranche = un commit. |
+| 0–3 | Lit le sujet à voix haute, annonce la méthode : « je pars de la journée du gérant, pas des tables ». | `kickoff` : `SPEC.md` (journée, workflows, décisions). |
+| 3–5 | Relit `SPEC.md` à l'écran : commente la journée et 2–3 workflows retenus / rejetés. Corrige si besoin. | Démarre le workflow 1. |
+| 5–25 | Suit les commits, ouvre l'app après chaque workflow, verbalise ce qu'il vérifie, interrompt si l'agent boucle. | Workflows du sujet, puis document implicite (commande, inventaire). |
 | 25–32 | Essaie de casser l'app (survente, double annulation, SKU en double) devant l'examinateur. | Corrige ce qui casse. |
 | 32–40 | Démo en suivant `DEMO.md` et `/about`. | `demo-ready` fait. |
 
@@ -129,4 +131,4 @@ tester les cas interdits, savoir expliquer chaque choix (la page `/about` sert d
 ## S'entraîner
 
 `subjects/stockly.md` : cloner (`git clone vibe-starter essai-1`), chrono 40 min, ne pas regarder de solution.
-Après chaque essai, ajouter à `AGENTS.md` ou à `wow-features` ce qui a manqué ou ce que l'agent a raté deux fois.
+Après chaque essai, ajouter à `AGENTS.md` ou à `workflow-screens` ce qui a manqué ou ce que l'agent a raté deux fois.
