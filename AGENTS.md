@@ -47,6 +47,8 @@ src/app/<route>/page.tsx       async server page: parse searchParams with zod, c
 Rules:
 - Reads happen in server components via `queries.ts`. No API routes and no client fetching, except a `route.ts` for file downloads (CSV).
 - Mutations are server actions returning `ActionState` (`src/lib/action-state.ts`). Validate with zod on the server, always.
+  Every error return (zod or domain) includes `values: formValues(formData)`, and the form uses `defaultValue={values.x}`:
+  React 19 resets uncontrolled forms after an action, so without it the user loses what they typed.
 - Multi-step writes (e.g. update stock + insert movement) go in ONE `db.transaction((tx) => ...)`. Check invariants inside the transaction before writing.
 - Filters, search, sort live in the URL (`searchParams`), parsed by a zod schema with `.catch()` defaults.
 - Money: store integer cents, format with `formatCurrency(cents / 100)` from `src/lib/format.ts`.

@@ -4,12 +4,13 @@ import { eq } from "drizzle-orm"
 import { revalidatePath } from "next/cache"
 import { db } from "@/db"
 import { tasks } from "@/db/schema"
-import { invalid, type ActionState } from "@/lib/action-state"
+import { formValues, invalid, type ActionState } from "@/lib/action-state"
 import { taskInput } from "./validation"
 
 export async function saveTask(id: number | null, _prev: ActionState, formData: FormData): Promise<ActionState> {
-  const parsed = taskInput.safeParse(Object.fromEntries(formData))
-  if (!parsed.success) return invalid(parsed.error)
+  const values = formValues(formData)
+  const parsed = taskInput.safeParse(values)
+  if (!parsed.success) return invalid(parsed.error, values)
 
   if (id === null) db.insert(tasks).values(parsed.data).run()
   else db.update(tasks).set(parsed.data).where(eq(tasks.id, id)).run()
