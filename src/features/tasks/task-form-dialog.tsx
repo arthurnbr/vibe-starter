@@ -14,8 +14,8 @@ import { initialActionState } from "@/lib/action-state"
 import { saveTask } from "./actions"
 import { priorityLabel, statusLabel } from "./labels"
 
-export function TaskFormDialog({ task, trigger }: { task?: Task; trigger: React.ReactNode }) {
-  const [open, setOpen] = useState(false)
+export function TaskFormDialog({ task, trigger, defaultOpen = false }: { task?: Task; trigger: React.ReactNode; defaultOpen?: boolean }) {
+  const [open, setOpen] = useState(defaultOpen)
   return (
     <Dialog open={open} onOpenChange={setOpen}>
       <DialogTrigger asChild>{trigger}</DialogTrigger>

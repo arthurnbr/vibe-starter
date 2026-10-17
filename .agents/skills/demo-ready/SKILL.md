@@ -1,16 +1,17 @@
 ---
 name: demo-ready
-description: Final 5-minute pass before a demo: reset seed, run checks, walk the main flows, write a short demo script and trade-offs. Use when the user says demo, wrap up, finish, or time is almost over.
+description: Final pass before a demo: reset seed, run checks, walk every flow, fill the /about methodology page, write DEMO.md with a narrative script. Use when the user says demo, wrap up, finish, or ~5 minutes remain.
 ---
 
 # Demo ready
 
-1. `npm run db:reset` then `npm run check`. Fix anything red first.
-2. Walk every MUST from `SPEC.md`. Fix only failures.
-3. Edge states render: empty list, alert highlight, validation error, rejected invariant (toast).
-4. Remove dead code, stray `console.log`, unused scaffold leftovers.
+1. `npm run db:reset`, `npm run check`. Fix anything red first.
+2. Walk every MUST and every shipped WOW feature in the browser. Fix only failures; hide nothing broken behind a link.
+3. Fill `src/app/about/page.tsx`: STACK (with rejected alternatives), CHOICES (data model, where invariants are
+   enforced, UX principles), LIMITS. Add the build process: brief → SPEC → slices, how AI output was checked.
+4. Remove the `tasks` example if a real feature replaced it (nav, search, palette, seed, feature folder).
 5. Write `DEMO.md`:
-   - **Script**: 5–7 steps in brief order: what to click, what to point out.
-   - **Choices**: stack, data model, where invariants are enforced, why (one line each).
-   - **AI usage**: where AI output was corrected or rejected.
-   - **Skipped / next**: what was cut, what one more hour would add.
+   - **Storyline** (6–8 beats from `SPEC.md`), each: what to click, which feature it shows, what to say.
+   - **Feature list**: MUST and WOW, one line each.
+   - **Choices & AI usage**: where AI output was corrected or rejected.
+   - **Limits / next hour**.

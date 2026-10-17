@@ -14,6 +14,10 @@ export function listTasks({ q, status }: z.infer<typeof taskFilters>) {
     .all()
 }
 
+export function searchTasks(q: string) {
+  return db.select({ title: tasks.title, status: tasks.status }).from(tasks).where(like(tasks.title, `%${q}%`)).limit(5).all()
+}
+
 export function getTaskStats() {
   const byStatus = db
     .select({ status: tasks.status, count: count(), hours: sum(tasks.estimateHours).mapWith(Number) })
