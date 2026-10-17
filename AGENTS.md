@@ -21,6 +21,7 @@ say "wow" (see `.agents/skills/wow-features`). Quality comes from the few hard r
 - Brief MUSTs done in the first ~40% of the time, as vertical slices. Then wow features, one slice at a time.
 - Use subagents/parallel work for independent slices when available (one owner per file).
 - `npm run check` after each slice; commit after each slice so a broken step never costs the demo.
+- At the end, stop any dev server you started and leave `npm run db:reset` state in place (the demo restarts the server).
 
 ## Commands
 
