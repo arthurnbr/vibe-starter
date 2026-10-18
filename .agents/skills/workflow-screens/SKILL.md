@@ -71,6 +71,15 @@ records" (catalogue, analytics, audit), a good table with search, sort and inlin
 - Inline consequences before submit (stock after, price change impact), not only server errors after.
 - Undo for destructive or bulk actions via toast with a compensating server action.
 
+### 7. Real-life completeness (what users hit on day 2)
+- **Search finds what is printed**: the human code on tickets (`R-0048`), the item description, not only the person.
+- **Shared screens stay fresh**: boards used by several people `router.refresh()` every 15–30 s; never claim
+  "temps réel" otherwise.
+- **Long columns get grouped** (by day, today first; collapse far days).
+- **Copy actions have a fallback** (selectable text, `sms:`/`tel:` links), since `navigator.clipboard` needs HTTPS.
+- **A French `not-found.tsx`** and an `error.tsx` in the app group.
+- **Demo-only pages** (`/about`) live outside the main nav (footer link or palette only).
+
 ## Anti-patterns (rewrite if you see them)
 - A page whose only content is a table mirroring a DB table and a "Nouveau X" dialog with the same columns.
 - A single-record dialog for something users do 20 times in a row.
@@ -78,3 +87,4 @@ records" (catalogue, analytics, audit), a good table with search, sort and inlin
 - Features that exist only to be shown (theme switch, single-key shortcuts) listed as backlog items.
 - Single-key keyboard shortcuts (`n`, `g x`, `v`): undiscoverable in a demo, conflict with typing. Ctrl K palette only.
 - A primary screen that is a table, when the domain has time, capacity or stages that a visual model would show.
+- A record that can no longer be edited, cancelled or stepped back after creation.

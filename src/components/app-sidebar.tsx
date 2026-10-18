@@ -9,7 +9,7 @@ import {
   Sidebar, SidebarContent, SidebarFooter, SidebarGroup, SidebarGroupContent, SidebarHeader, SidebarMenu,
   SidebarMenuButton, SidebarMenuItem,
 } from "@/components/ui/sidebar"
-import { NAV } from "@/lib/nav"
+import { ABOUT, NAV } from "@/lib/nav"
 
 export function AppSidebar({ onOpenPalette }: { onOpenPalette: () => void }) {
   const pathname = usePathname()
@@ -57,6 +57,14 @@ export function AppSidebar({ onOpenPalette }: { onOpenPalette: () => void }) {
       </SidebarContent>
       <SidebarFooter>
         <SidebarMenu>
+          <SidebarMenuItem>
+            <SidebarMenuButton asChild size="sm" isActive={isActive(ABOUT.href)} tooltip={ABOUT.label}>
+              <Link href={ABOUT.href}>
+                <ABOUT.icon />
+                <span>{ABOUT.label}</span>
+              </Link>
+            </SidebarMenuButton>
+          </SidebarMenuItem>
           <SidebarMenuItem>
             <SidebarMenuButton onClick={() => setTheme(resolvedTheme === "dark" ? "light" : "dark")} tooltip="Thème">
               {resolvedTheme === "dark" ? <SunIcon /> : <MoonIcon />}

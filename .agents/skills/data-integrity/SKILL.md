@@ -38,8 +38,23 @@ description: >-
 - **Statuses with distinct meanings stay distinct** in alerts and KPIs ("late to prepare" vs "ready, not collected";
   "booked revenue" vs "collected revenue").
 
+- **No silent overwrite of shared records**: a known phone with a different name asks "update the name or new
+  contact?"; never rename every past record in passing.
+- **Every fallback is explicit**: when the app cannot find a valid slot/date/stock, refuse or flag ("à replanifier")
+  with a message; never keep the old value silently (`?? previousValue` on a business rule is a smell).
+- **Overdue work still consumes capacity**: carry unfinished past items onto today in load computations.
+- **Uniqueness races**: check-then-insert outside the transaction still races; catch the UNIQUE error and return
+  the existing record instead of a 500.
+- **Records stay editable until a terminal status**: lines, contact, cancel, and one step back, each traced as an event.
+  Data frozen at creation (price, duration) is updated by these edits, not by catalogue changes.
+- **Public URLs** (QR, SMS, tracking links) come from one `publicUrl()` reading `PUBLIC_URL`, never from the `Host` header.
+
 ## Verify (and keep the proof)
-Write `scripts/check-invariants.ts` that tries each forbidden case directly against the actions or the DB
-(over capacity with an off-by-seconds slot, reactivate into a full slot, undo after cancel of each status, double
-create with the same requestId, invalid date, past slot) and prints PASS/FAIL. Run it before the demo; the candidate
-can run it live when asked "how do you know?".
+Write `scripts/check-invariants.ts` that:
+- calls **every write path** through the same function the server action uses (extract the transaction into a
+  plain function in `write.ts`, call it from both the action and the script), not raw SQL;
+- tries each forbidden case (over capacity, off-by-seconds slot, reactivate/resume into a full day, undo after each
+  status, simultaneous double create, invalid date, past slot, rename of a shared record);
+- ends with **global assertions over the whole DB** after reset (no day above capacity, totals = sum of lines,
+  every status consistent with its timestamps). If the seed violates one, fix the seed.
+Print PASS/FAIL. Claims in `/about` and `DEMO.md` cite only what the script really covers.

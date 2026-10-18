@@ -15,7 +15,7 @@ import {
   CommandList,
   CommandShortcut,
 } from "@/components/ui/command"
-import { NAV } from "@/lib/nav"
+import { ABOUT, NAV } from "@/lib/nav"
 import { searchEverything, type SearchHit } from "@/lib/search"
 
 // Global actions: add one entry per "create"/"export" a feature exposes.
@@ -84,7 +84,7 @@ export function CommandPalette({ open, setOpen }: { open: boolean; setOpen: (ope
             </CommandItem>
           </CommandGroup>
           <CommandGroup heading="Navigation">
-            {NAV.map((item) => (
+            {[...NAV, ABOUT].map((item) => (
               <CommandItem key={item.href} onSelect={() => run(() => router.push(item.href))}>
                 <item.icon />
                 {item.label}

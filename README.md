@@ -7,7 +7,7 @@ des charges d'un CRUD en une douzaine de minutes. Ce qui distingue en démo, ce 
 vernis (palette, thème sombre) : ce sont des écrans **en forme de tâche** qui font gagner du temps ou évitent une
 erreur à l'utilisateur, sur des données cohérentes. Le repo est réglé pour ça.
 
-## Ce qu'on a appris (5 essais, prompt de 3 lignes à partir du run 2)
+## Ce qu'on a appris (6 essais, 3 sujets)
 
 | Essai | Config | Temps | Résultat | Critique |
 |---|---|---|---|---|
@@ -16,6 +16,7 @@ erreur à l'utilisateur, sur des données cohérentes. Le repo est réglé pour 
 | Run 2 | shell riche + skill `wow-features` | 14 min 30 | + prévision de rupture, réassort, KPI avec variation, journal, courbe 90 j, Ctrl K. | Propre, mais **les écrans restent des listes + un formulaire avec les champs de la table** : un carnet de notes enrichi, des features « pour faire wow ». |
 | Run 3 | `kickoff` = journée de l'utilisateur → workflows ; skill `workflow-screens` ; écran de saisie multi-lignes de référence | 13 min 30 | Accueil « À traiter », réassort → réception pré-remplie de 11 lignes en une transaction, saisie du soir multi-lignes, inventaire attendu / compté. | Les écrans suivent le métier, mais **digitalisent le processus actuel** ; trop de raccourcis clavier une touche ; look shadcn gris par défaut. |
 | Run 4 (**nouveau sujet : Fournil**, boulangerie) | `kickoff` = « réinventer, pas digitaliser » (avant → après) ; skill `art-direction` + polices hors ligne ; raccourcis supprimés sauf Ctrl K ; patterns de vues du domaine | 10 min 40 | **Identité** : ticket kraft, Fraunces + DM Sans + mono, croûte dorée / farine / framboise. **Journée** = frise des créneaux avec charge (17 h complet en rouge) + colonnes à préparer → prête → retirée, non-retirés à rappeler en tête. **Commande** : téléphone → client reconnu, « reprendre sa dernière commande » ; créneaux passés/complets désactivés, produits grisés avec « possible dès mar. 16 h » ; acompte suggéré. **Fournée** du jour calculée, triée par premier retrait, imprimable. Ticket imprimable. | L'app **change la façon de faire** (l'app refuse avant le client, calcule la production, lisse les retraits). Reste : page client publique rejetée « hors délai » alors qu'il restait 29 min → règle « use the time » ajoutée. |
+| Run 5 (**nouveau sujet : Rayon**, atelier vélo) — protocole post-critique : arrêt après SPEC, calendrier unique, script de preuves | candidat (moi) au point d'arrêt : priorité « dépôt à date tenable + suivi client », règle « attente de pièce libère la capacité », alerte « promesses en danger » | 15 min 20 (arrêt de 1 min inclus) | **Dépôt** : téléphone → client reconnu avec historique, prix et durée en direct, **jauges de charge sur 12 jours** (2 mécaniciens × 7 h), première date tenable proposée, jours pleins barrés et refusés par le serveur. **Ticket** étiquette kraft avec QR. **Atelier** en colonnes par statut, badges « en retard » / « jour surchargé », « Replanifier » au premier jour libre, « Pièce reçue » qui revérifie et décale la promesse. **SMS prêt** pré-rédigé. **Page client publique** `/suivi/<code>` mobile. 18 invariants PASS, verify vert, aucun serveur laissé. | **Jury sans contexte : 15/20, « embaucher »** (« la promesse de date est une vraie règle, pas une aide visuelle »). Défauts : client renommé en silence, « pièce reçue » qui garde une date pleine faute d'alternative, QR vers `localhost`, recherche impossible par n° de ticket, réparation non modifiable après dépôt, retards ignorés par la charge, script de preuves partiel. **Transformés en règles génériques** (data-integrity, workflow-screens §7). |
 
 Conclusions :
 1. **Concevoir à partir des données donne un carnet de notes**, même avec beaucoup de features. Le levier qui a
@@ -35,6 +36,12 @@ Conclusions :
    l'utilisateur, que sait-elle qu'il ne voit pas ? » et de vues du domaine (créneaux, étapes, production) au lieu de tables.
 8. **La personnalité se décide en 5 min, une fois** : 3 mots d'ambiance, un objet de référence du métier, un élément
    signature, une paire de polices. Ensuite chaque écran en hérite.
+9. **Le point d'arrêt après le SPEC ne coûte rien et change la donne** (run 5) : 1 min 15 d'arrêt, et la décision du
+   candidat (« l'attente de pièce libère la capacité ») est devenue la meilleure fonctionnalité selon le jury.
+   C'est aussi ce qui rend la démo défendable : le candidat a pris une vraie décision métier, visible dans l'app.
+10. **Le plafond de qualité est maintenant la complétude du jour 2**, plus les idées : ce qui manque est ce qu'un
+   utilisateur rencontre le lendemain (modifier, annuler, chercher ce qui est imprimé, écrans partagés à jour).
+   Ces points sont dans `workflow-screens` §7 et dans `data-integrity`.
 
 ## Critique externe (agents sans contexte, sur Fournil et sur ce starter)
 
