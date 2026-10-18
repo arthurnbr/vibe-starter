@@ -51,6 +51,10 @@ See `kickoff`, `art-direction`, `workflow-screens`. Quality comes from the hard 
 Remote access: `next.config.ts` sets `allowedDevOrigins` to this machine's IPs. Without it, opening `next dev` from
 another device (LAN, Tailscale, phone) shows the page but blocks its scripts: **nothing reacts**. Do not remove it.
 
+Over plain http on a network IP the page is **not a secure context**: `crypto.randomUUID()`, `navigator.clipboard`,
+`navigator.share`, geolocation… are undefined and crash the page. Use `newRequestId()` from `src/lib/request-id.ts`
+for form ids, and give every clipboard action a fallback. `npm run e2e` runs over the network IP to catch this.
+
 SQLite gotcha: `db:reset` deletes the file a running dev server holds open. **After any reset, restart the dev server**
 before looking at the app, or it shows an orphaned database.
 

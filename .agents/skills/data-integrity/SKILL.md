@@ -27,7 +27,8 @@ description: >-
 - **Undo restores the exact previous state** (keep `previousStatus` or pass it to the action) and is only offered when
   that transition is allowed. Destructive actions (cancel, delete) get a confirmation or an undo window of ≥ 10 s.
 - **Double submit**: disable the whole form with a ref set synchronously on submit (not only `pending`), and make
-  creation idempotent with a client-generated `requestId` stored under a `unique()` constraint.
+  creation idempotent with a client-generated `requestId` (`newRequestId()` from `src/lib/request-id.ts`, never
+  `crypto.randomUUID()`: undefined over http on a network IP) stored under a `unique()` constraint.
 - **One business time zone.** Define `const TZ = "Europe/Paris"` once; build slots, "today", week and month bounds
   with it on the server. Never trust the browser's local time for business rules.
 - **Human codes from a sequence** (`F-0123` from the row id or a counter), never from truncated `Date.now()`.
