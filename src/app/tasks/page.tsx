@@ -15,7 +15,7 @@ export default async function TasksPage({ searchParams }: PageProps<"/tasks">) {
     <>
       <div className="flex items-center justify-between">
         <h1 className="text-2xl font-semibold">Tâches</h1>
-        {/* key: remount when the palette/"n" shortcut navigates to ?new=1 so the dialog opens. */}
+        {/* key: remount when the palette navigates to ?new=1 so the dialog opens. */}
         <TaskFormDialog key={params.new === "1" ? "new" : "idle"} defaultOpen={params.new === "1"} trigger={<Button><PlusIcon />Nouvelle tâche</Button>} />
       </div>
       <TaskFilters />

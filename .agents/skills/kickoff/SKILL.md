@@ -1,76 +1,73 @@
 ---
 name: kickoff
-description: Turn a product brief / cahier des charges into SPEC.md by designing around the users' real work (jobs, moments, pains) instead of the database: workflows, task-shaped screens, decisions the app makes for them, data model, invariants, demo storyline. Use at the very start of a timed build, or when the user pastes a brief, subject, or "sujet".
+description: Turn a product brief / cahier des charges into SPEC.md by rethinking how the job should be done, not by digitising the current process or mirroring the data - a day in the life, the pains, the new way of working the app enables, task-shaped workflows, decisions the app makes, data model, invariants, demo storyline. Use at the very start of a timed build, or when the user pastes a brief, subject, or "sujet".
 ---
 
 # Kickoff: brief → SPEC.md (≤ 6 minutes, then build)
 
-The trap: the brief describes **data** ("a product has a name, a SKU…"). A naive app mirrors it: one table per
-entity, one form per table, a dashboard of counts. That is a notebook. The reviewer wants a **tool**: it knows
-the user's job, removes their tedious steps, and tells them what to do next.
+Three levels of app. Aim for level 3.
+1. **Notebook**: one table + one form per entity, a dashboard of counts. Mirrors the database. Rejected.
+2. **Digitised process**: today's paper/spreadsheet workflow, on screen. Better, still forgettable.
+3. **New way of working**: the app changes *how* the job is done because it knows things the user cannot hold in
+   their head (time, capacity, history, constraints) and does the tedious part for them. The user's day is
+   different, and better, because the app exists.
 
-## 1. Live a day in the user's shoes (write it down, 8–12 lines)
+## 1. A day in the life (8–12 lines)
 
-For each persona (owner, clerk, warehouse…): a timeline of a real day/week. For each moment:
-**when · where · what they hold (phone, box, receipt, supplier email) · what they must decide · what is painful today**
-(re-typing, counting, checking two places, remembering, calculating in their head, forgetting).
+For each persona: real moments. For each: **when · where · what they hold · what they must decide · pain today**
+(re-typing, counting, checking two places, remembering, calculating, phoning, forgetting, being interrupted).
 
-Example (shop stock): "Tue 9:00, a supplier box arrives with a packing slip of 14 lines; today the owner types
-each line into a spreadsheet, and never notices the 2 missing items." → a feature is born.
+## 2. Reinvent, don't digitise (the core step)
 
-## 2. Turn pains into workflows (the core of the backlog)
+For each pain, ask in order:
+- **Can the app make this decision instead of the user?** (schedule, allocate, prioritise, suggest a quantity, pick a slot)
+- **Can the app remove the step entirely?** (pre-fill from what it already knows, generate the document, infer the status)
+- **Can the app change who does it or when?** (customer self-serves, work is spread to quiet hours, preparation happens before the rush)
+- **What does the app know that the user cannot see?** (capacity over time, trends, conflicts, what will happen if nothing changes) → show it as a **visual model of the domain**, not a table: a timeline, a capacity gauge per slot, a board by stage, a calendar heat, a floor/shelf map, a production plan.
 
-For each painful moment, design a **workflow screen** shaped like the task, not like the table:
-- **Batch entry where reality is batch**: end-of-day sales sheet, reception of a delivery against an order,
-  inventory count by shelf. One screen, many lines, keyboard-driven, scan/search-to-add, totals live, one submit.
-- **Compare expected vs actual**: received vs ordered, counted vs system, cash vs sales → show the gap, ask for
-  a reason, write the adjustment.
-- **Decisions computed for the user**: "order 24 from Supplier X before Thursday to avoid a stock-out on
-  Saturday", "these 5 items have not sold in 90 days: discount them", "you count shelf B this week".
-  Each decision has a one-click way to act on it (draft order, mark, schedule).
-- **Lifecycle objects** the brief implies but does not name: purchase order (draft → sent → partially received
-  → received), inventory session (open → counted → validated), return. Status, timestamps, who/when.
-- **Inbox / today screen**: the landing page is "what needs my attention now", ranked, each item actionable,
-  not a wall of KPIs.
+Write the result as **before → after** lines: "Avant : le boulanger compte les commandes sur un cahier la veille au soir.
+Après : la fournée du lendemain est calculée et imprimée, les clients ne peuvent plus réserver au-delà du four."
 
-## 3. Rejection test (apply to every feature before keeping it)
+## 3. Workflows and their primary surface
 
-Reject or rework a feature if:
-- it is "list of <table> + form with the same fields as <table>" and nothing else;
-- it only displays data the user could see by sorting a spreadsheet;
-- it is decoration (theme, shortcut, palette, animation) — those are polish, never backlog items;
-- you cannot name the persona moment and the minutes or the mistake it saves.
-Keep it if you can write: "<persona> at <moment> no longer has to <pain>, the app <does X>".
+For each "after", design the screen around the **domain object the user thinks in** (the day's production, a time
+slot, a route, a shelf), not around a DB table. Use `.agents/skills/workflow-screens`. Every screen has one primary
+action and shows the consequence before the user commits.
+
+**Rejection test** for every screen/feature:
+- it is "list of <table> + form with the same fields" → rework into a domain view or remove;
+- it displays data without changing a decision → remove or attach a decision;
+- it is decoration (palette, theme, animation) → not a feature;
+- you cannot write its before → after line → remove.
 
 ## 4. Then the usual
 
-- **MUST**: every line of the brief, folded into the workflows above when possible (e.g. "record an exit" is
-  covered by the end-of-day sales sheet; single-movement entry stays as a fallback).
-- **Do not reject an implied lifecycle document "for time"**: a recent agent ships the brief in ~12 min. Budget for
-  4–5 workflows including at least one document the job implies but the brief does not name (purchase order with
-  supplier, inventory session, return). Plan it as phase 2, after the brief workflows are committed.
-- **Data model** that the workflows need (suppliers, orders, order lines, counts…), money in cents, constraints.
+- **Brief coverage**: every brief line mapped to where it lives (often inside a workflow; plain CRUD only as fallback).
+- **Scope**: a recent agent ships a brief in ~12 min. Plan 4–5 workflows, including at least one the brief implies but
+  does not name (a document, a schedule, a customer-facing side). Build brief-covering workflows first, commit, then the rest.
+- **Data model** that the new way of working needs; money in cents; constraints.
 - **Invariants**: rule → where enforced.
-- **Seed** that makes each workflow meaningful (an order awaiting delivery, a delivery with missing lines,
-  slow movers, a product about to run out before the next delivery).
-- **Demo storyline** = the persona's day, beat by beat, each beat a workflow that saves time or prevents a mistake.
+- **Art direction**: 3 lines (mood, reference object, signature element), then apply `art-direction`.
+- **Seed** that makes each workflow meaningful (a busy day, a conflict, a capacity limit reached, an edge case).
+- **Demo storyline** = the persona's new day, beat by beat, each beat a before → after.
 
 ## SPEC.md template
 
 ```md
 # <App> — spec
-## A day in the life
-| when | who | situation (holds / decides) | pain today | feature |
-## Workflows (task-shaped screens)
-### <Workflow name> — <persona, moment>
-steps · what the app computes · what it prevents · invariants touched
-## Decisions the app makes for the user
-| decision | inputs | action button |
+## A day in the life (today)
+| when | who | situation | pain |
+## The new way of working
+| before | after (what the app does) | screen |
+## Workflows
+### <name> — <persona, moment>
+domain object shown · what the app computes/decides · primary action · consequence shown before commit · invariants
 ## Brief coverage
-| brief line | covered by |
-## Data model / Invariants / Seed plan
-## Demo storyline (the persona's day)
+## Data model / Invariants
+## Art direction
+## Seed plan
+## Demo storyline (the new day)
 ## Rejected ideas (and why)
 ```
 
-Do not wait for approval: write SPEC.md, then build with `ship-feature`, workflows first.
+Do not wait for approval: write SPEC.md, apply art direction, then build workflows.

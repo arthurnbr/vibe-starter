@@ -1,7 +1,7 @@
 "use client"
 
 import Link from "next/link"
-import { usePathname, useRouter } from "next/navigation"
+import { usePathname } from "next/navigation"
 import { MoonIcon, SearchIcon, SunIcon } from "lucide-react"
 import { useTheme } from "next-themes"
 import { Kbd } from "@/components/ui/kbd"
@@ -9,16 +9,12 @@ import {
   Sidebar, SidebarContent, SidebarFooter, SidebarGroup, SidebarGroupContent, SidebarHeader, SidebarMenu,
   SidebarMenuButton, SidebarMenuItem,
 } from "@/components/ui/sidebar"
-import { useHotkeys } from "@/hooks/use-hotkey"
 import { NAV } from "@/lib/nav"
 
 export function AppSidebar({ onOpenPalette }: { onOpenPalette: () => void }) {
   const pathname = usePathname()
-  const router = useRouter()
   const { resolvedTheme, setTheme } = useTheme()
   const isActive = (href: string) => (href === "/" ? pathname === "/" : pathname.startsWith(href))
-
-  useHotkeys(Object.fromEntries(NAV.map((item) => [item.shortcut, () => router.push(item.href)])))
 
   return (
     <Sidebar collapsible="icon">
@@ -50,8 +46,7 @@ export function AppSidebar({ onOpenPalette }: { onOpenPalette: () => void }) {
                   <SidebarMenuButton asChild isActive={isActive(item.href)} tooltip={item.label}>
                     <Link href={item.href}>
                       <item.icon />
-                      <span className="flex-1">{item.label}</span>
-                      <Kbd>{item.shortcut}</Kbd>
+                      <span>{item.label}</span>
                     </Link>
                   </SidebarMenuButton>
                 </SidebarMenuItem>

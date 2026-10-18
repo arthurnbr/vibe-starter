@@ -15,12 +15,11 @@ import {
   CommandList,
   CommandShortcut,
 } from "@/components/ui/command"
-import { useHotkeys } from "@/hooks/use-hotkey"
 import { NAV } from "@/lib/nav"
 import { searchEverything, type SearchHit } from "@/lib/search"
 
 // Global actions: add one entry per "create"/"export" a feature exposes.
-const ACTIONS = [{ label: "Nouvelle tâche", href: "/tasks?new=1", icon: PlusIcon, shortcut: "n" }]
+const ACTIONS = [{ label: "Nouvelle tâche", href: "/tasks?new=1", icon: PlusIcon }]
 
 export function CommandPalette({ open, setOpen }: { open: boolean; setOpen: (open: boolean) => void }) {
   const router = useRouter()
@@ -30,10 +29,17 @@ export function CommandPalette({ open, setOpen }: { open: boolean; setOpen: (ope
   const [, startTransition] = useTransition()
   const debounced = useDebounce(query, 150)
 
-  useHotkeys({
-    "mod+k": () => setOpen(!open),
-    ...Object.fromEntries(ACTIONS.map((action) => [action.shortcut, () => router.push(action.href)])),
-  })
+  // Ctrl/Cmd+K is the only global shortcut: universal, discoverable, and it opens everything else.
+  useEffect(() => {
+    const onKeyDown = (event: KeyboardEvent) => {
+      if ((event.metaKey || event.ctrlKey) && event.key.toLowerCase() === "k") {
+        event.preventDefault()
+        setOpen(!open)
+      }
+    }
+    window.addEventListener("keydown", onKeyDown)
+    return () => window.removeEventListener("keydown", onKeyDown)
+  }, [open, setOpen])
   useEffect(() => {
     startTransition(async () => setHits(await searchEverything(debounced)))
   }, [debounced])
@@ -70,7 +76,6 @@ export function CommandPalette({ open, setOpen }: { open: boolean; setOpen: (ope
               <CommandItem key={action.label} onSelect={() => run(() => router.push(action.href))}>
                 <action.icon />
                 {action.label}
-                <CommandShortcut>{action.shortcut}</CommandShortcut>
               </CommandItem>
             ))}
             <CommandItem onSelect={() => run(() => setTheme(resolvedTheme === "dark" ? "light" : "dark"))}>
@@ -83,7 +88,6 @@ export function CommandPalette({ open, setOpen }: { open: boolean; setOpen: (ope
               <CommandItem key={item.href} onSelect={() => run(() => router.push(item.href))}>
                 <item.icon />
                 {item.label}
-                <CommandShortcut>{item.shortcut}</CommandShortcut>
               </CommandItem>
             ))}
           </CommandGroup>

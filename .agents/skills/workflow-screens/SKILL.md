@@ -1,6 +1,6 @@
 ---
 name: workflow-screens
-description: Patterns and code recipes for task-shaped screens that save users real work - batch entry sheets, expected-vs-actual reconciliation, lifecycle documents (order, count, return), a today/inbox page with actionable recommendations, smart defaults and inline guards. Use when designing or building any screen beyond plain CRUD, or when a feature risks being "a table plus a form".
+description: Patterns and code recipes for task-shaped screens that change how users work - visual models of the domain (timeline, capacity per slot, board by stage, plan), the app deciding/allocating for the user, customer self-service sides, batch entry, expected-vs-actual reconciliation, lifecycle documents, a today page with actions, consequences shown before commit. Use when designing or building any screen beyond plain CRUD, or when a feature risks being "a table plus a form".
 ---
 
 # Workflow screens
@@ -8,6 +8,24 @@ description: Patterns and code recipes for task-shaped screens that save users r
 A workflow screen matches one real task end to end. Build it as one vertical slice (`ship-feature`).
 
 ## Patterns
+
+### 0. Visual model of the domain (the primary surface, prefer it over tables)
+Show the thing the user thinks in, so constraints become visible and decisions obvious:
+- **Timeline / agenda** of slots with capacity bars (orders per pickup slot, appointments per chair, deliveries per day).
+  Build: CSS grid, one column per slot, a bar whose fill = load / capacity, color shifts near the limit; click a slot → its content.
+- **Board by stage** (to prepare → ready → handed over; received → in repair → done), cards show what matters for the next step.
+  Moving a card = server action that checks the transition.
+- **Production / preparation plan** computed from demand ("4 fournées : 1 h 30 tradition, 3 h 00 viennoiseries"),
+  printable, with what to start first.
+- **Gauge / runway** for a resource (oven, stock, budget, seats) over time, showing when it breaks.
+- **Map or floor plan** when space matters (tables, shelves, zones).
+Tables remain for search/admin, never as the main screen of a workflow.
+
+### 0b. The app decides, the user confirms
+- Allocation: the app proposes the slot, the route, the batch, the person; the user accepts or drags to change.
+- Constraint-aware input: impossible options are disabled with the reason ("Complet", "Four plein à 7 h"), not rejected after submit.
+- Self-service side: when a third party (customer, supplier) creates work, give them their own minimal page so
+  the user stops re-typing (`/commander`, `/suivi/<code>`). Public pages have no sidebar.
 
 ### 1. Batch entry sheet (end-of-day sales, delivery slip, stock count)
 - Add lines by typing a name/SKU in a search box (`Command` in a `Popover`), Enter adds the line and refocuses search.
@@ -56,4 +74,6 @@ A workflow screen matches one real task end to end. Build it as one vertical sli
 - A page whose only content is a table mirroring a DB table and a "Nouveau X" dialog with the same columns.
 - A single-record dialog for something users do 20 times in a row.
 - A dashboard of totals with no "so what / do what".
-- Features that exist only to be shown (theme switch, shortcuts) listed as backlog items.
+- Features that exist only to be shown (theme switch, single-key shortcuts) listed as backlog items.
+- Single-key keyboard shortcuts (`n`, `g x`, `v`): undiscoverable in a demo, conflict with typing. Ctrl K palette only.
+- A primary screen that is a table, when the domain has time, capacity or stages that a visual model would show.

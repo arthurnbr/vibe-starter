@@ -11,17 +11,17 @@ This block is written and re-added by `next dev` — verify at `node_modules/nex
 # Project
 
 Interview starter: Next.js 16 full-stack app (one process, SQLite file). You get a brief and ~40 minutes.
-**The goal is a tool that does real work for its users**, demoed as their day. The brief describes data;
-do not mirror it as "one table + one form per entity". Design from the users' jobs: batch where reality is batch,
-reconcile expected vs actual, compute decisions with a one-click action, model the documents the job implies
-(order, count, return). See `kickoff` and `workflow-screens`. Polish (palette, shortcuts, dark mode) is already
-in the shell and is never a backlog item. Quality comes from the hard rules below.
+**The goal is an app that changes how the job is done, for the better**, demoed as the user's new day.
+The brief describes data and today's process; do not mirror either. The app should decide, allocate, pre-fill and
+warn using what it knows (time, capacity, history, constraints), and show the domain as the user thinks of it
+(timeline, slots, stages, plan), not as tables. It has its own visual identity tied to the domain.
+See `kickoff`, `art-direction`, `workflow-screens`. Quality comes from the hard rules below.
 
 ## Pace
 
 - Work autonomously: decide, note the assumption in `SPEC.md`, keep going. Never stop to ask.
-- `kickoff` (SPEC) in ≤ 6 min. Brief lines are folded into workflows; build workflows first, single-record CRUD
-  only as fallback. Aim for 3–4 workflows that each save a persona real minutes or prevent a real mistake.
+- `kickoff` (SPEC) in ≤ 6 min, then `art-direction` in ≤ 5 min, then workflows. Plain CRUD only as fallback.
+  Aim for 4–5 workflows; each has a before → after line in SPEC.md.
 - Use subagents/parallel work for independent slices when available (one owner per file).
 - `npm run check` after each slice; commit after each slice so a broken step never costs the demo.
 - At the end, stop any dev server you started and leave `npm run db:reset` state in place (the demo restarts the server).
@@ -39,8 +39,10 @@ in the shell and is never a backlog item. Quality comes from the hard rules belo
 ## Stack
 
 Next.js App Router · shadcn/ui (radix) · Tailwind v4 · Drizzle + better-sqlite3 · zod 4 · recharts via shadcn `chart` ·
-es-toolkit · date-fns · lucide-react · sonner · motion · next-themes. Already wired in the shell:
-sidebar, command palette (Ctrl K), keyboard shortcuts, dark mode, toasts, `/about` methodology page.
+es-toolkit · date-fns · lucide-react · sonner · motion · next-themes · offline fonts `@fontsource-variable/*`
+(Bricolage Grotesque, Fraunces, Space Grotesk, Instrument Sans, Manrope, DM Sans, JetBrains Mono).
+Already wired in the shell: sidebar, command palette (Ctrl K), dark mode, toasts, `/about` methodology page.
+No other keyboard shortcuts: single-key shortcuts are undiscoverable in a demo and conflict with typing.
 
 Adding a dependency is fine when it buys a visible feature (map: `maplibre-gl`; drag & drop: `@dnd-kit/core`;
 calendar views; PDF/QR…). Missing shadcn component: `npx shadcn@latest add <name>`, never hand-write one.
@@ -57,7 +59,7 @@ src/features/<x>/*.tsx          UI: form dialog (useActionState), table, filters
 src/features/tasks/task-batch-sheet.tsx + batch*.ts  reference batch screen: lines in client state, typed payload,
                                 one transaction, per-line errors. Copy it for any multi-line workflow.
 src/app/<route>/page.tsx        async server page: parse searchParams with zod, call queries, render
-src/lib/nav.ts                  one line per page → sidebar + palette + "g <key>" shortcut
+src/lib/nav.ts                  one line per page → sidebar + palette
 src/lib/search.ts               one block per entity → global search in the palette
 src/components/command-palette.tsx  ACTIONS: one line per global action (create, export…)
 src/app/about/page.tsx          methodology page: fill STACK/CHOICES/LIMITS at the end
@@ -86,8 +88,9 @@ src/app/about/page.tsx          methodology page: fill STACK/CHOICES/LIMITS at t
 
 ## Skills (`.agents/skills`)
 
-- `kickoff`: brief → `SPEC.md` = a day in the life, pains → workflows, decisions the app makes, brief coverage, model, demo storyline.
-- `workflow-screens`: batch entry, expected vs actual, lifecycle documents, today/inbox, trusted recommendations.
+- `kickoff`: brief → `SPEC.md` = today's day, before → after (the new way of working), workflows, brief coverage, model, art direction, demo storyline.
+- `art-direction`: domain-tied palette, font pairing, signature element, voice. ≤ 5 min.
+- `workflow-screens`: visual domain models, the app decides, self-service sides, batch entry, expected vs actual, documents, today page.
 - `ship-feature`: implement one vertical slice following `src/features/tasks`.
 - `data-integrity`: transactions, invariants, history, undo.
 - `demo-ready`: final pass, `/about`, `DEMO.md`.
