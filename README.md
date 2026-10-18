@@ -27,13 +27,40 @@ Conclusions :
    invisibles en démo et gênent la saisie. Seul Ctrl K (palette) reste.
 4. **Les skills de sobriété (ponytail, karpathy) brident un greenfield de 40 min** ; la propreté vient de règles
    dures (validation serveur, transactions, contraintes), qui ont tenu sur les 3 runs.
-5. **Le prompt du candidat reste court** (3 lignes) : la méthode est dans `AGENTS.md` et les skills.
-6. **L'agent sous-estime le temps disponible** : il coupe « par prudence » ce qui ferait la différence (runs 3 et 4).
-   `AGENTS.md` impose maintenant de continuer tant qu'il reste plus de 10 min, et le SPEC a une « phase 2 » au lieu de « rejeté faute de temps ».
+5. **Le prompt du candidat reste court** : la méthode est dans `AGENTS.md` et les skills.
+6. **L'agent sous-estime le temps disponible** et coupe « par prudence » (runs 3 et 4). Mais la critique externe a
+   montré l'excès inverse : interdire de renoncer retire au candidat un arbitrage attendu. Solution retenue : un
+   calendrier unique avec une fenêtre d'extension (22–28) conditionnée à « tout le sujet marche », puis un gel.
 7. **Digitaliser ≠ réinventer.** Le saut du run 4 vient de la question « que peut décider l'app à la place de
    l'utilisateur, que sait-elle qu'il ne voit pas ? » et de vues du domaine (créneaux, étapes, production) au lieu de tables.
 8. **La personnalité se décide en 5 min, une fois** : 3 mots d'ambiance, un objet de référence du métier, un élément
    signature, une paire de polices. Ensuite chaque écran en hérite.
+
+## Critique externe (agents sans contexte, sur Fournil et sur ce starter)
+
+Trois revues indépendantes, faites par des agents qui ne connaissaient ni nos échanges ni nos intentions.
+
+| Revue | Verdict | Points clés |
+|---|---|---|
+| Jury produit (Fournil, testé dans un navigateur + appels serveur directs) | **Embaucher avec réserves, 15/20** | Pense métier avant écran ; règles tenues côté serveur. Mais : « Annuler » du toast ne restaure pas une commande prête ; double envoi crée 2 commandes ; alerte qui confond « pas prêt » et « pas retiré » ; KPI dont le lien inclut les annulées ; date invalide → 500 ; recherche sensible aux accents ; affirmations de `DEMO.md` calées sur une heure précise. |
+| Revue de code (Fournil) | Code 13/20, données 11/20 | Capacité contournable avec un créneau à 17:00:01 ; réactivation sans re-vérifier la capacité ; seed qui viole les délais et crée de l'historique futur ; codes tirés de `Date.now()` ; fuseau horaire implicite. |
+| Revue du starter | 6/10 pour un entretien piloté par le candidat | **Le candidat devient passager** (autonomie totale, aucune décision) ; risque si le code préparé est interdit ; trois calendriers contradictoires ; `demo-ready` vérifiait avant de modifier ; exemples de référence bogués (lot modifiable pendant l'envoi, filtres qui s'écrasent, mise à jour fantôme, `?new` non réarmable, KPI/lien incohérents) ; YAML de `demo-ready` invalide ; Node ≥ 20 faux. |
+
+Corrigé dans le starter :
+- **Candidat décisionnaire** : arrêt unique après `SPEC.md` (résumé en 6 lignes, le candidat choisit), précontrôle
+  « ce starter est-il autorisé ? », trace des corrections demandées à l'IA.
+- **Un seul calendrier** (AGENTS.md = README), gel à 28 min, renoncer à un bonus est légitime.
+- **`demo-ready`** : exemple retiré dès la minute 5–8, redémarrage après reset, `npm run verify` en tout dernier.
+- **Preuves rejouables** : `npm run invariants` (script modèle `scripts/check-invariants.ts`), exigé pour toute
+  affirmation « refusé » de `DEMO.md`.
+- **`data-integrity`** liste les pièges trouvés par les revues : créneau canonique, capacité re-vérifiée à chaque
+  transition, undo = état exact, double envoi (verrou synchrone + `requestId` unique), fuseau métier unique, codes
+  séquentiels, dates calendaires validées, normalisation téléphone/accents, statuts distincts dans KPI et alertes.
+- **Code de référence corrigé et vérifié dans le navigateur** : lot verrouillé pendant l'envoi + garde contre le
+  double clic, erreurs rattachées à la ligne même après suppression, limite de 50 lignes affichée ; filtres qui
+  fusionnent recherche en attente et statut ; mise à jour d'une ligne disparue = erreur ; `?new` réarmable ;
+  KPI et lien partagent le même filtre ; contraintes SQL `CHECK` sur les enums.
+- YAML valide, Node 22 (`.nvmrc`, `engines`), `/about` sans affirmation fausse, règles subjectives rendues conditionnelles.
 
 ## Ce qu'il y a dedans
 
@@ -61,21 +88,36 @@ Conclusions :
 | `workflow-screens` | Patterns d'écrans en forme de tâche : saisie multi-lignes, attendu vs réel avec motif d'écart, documents à cycle de vie (commande, inventaire, retour), page « À traiter » avec actions, recommandations explicables, valeurs par défaut et garde-fous. |
 | `ship-feature` | Une tranche verticale : schéma → validation → requêtes → actions → UI → nav/palette → seed → vérif → commit. |
 | `data-integrity` | Transactions, invariants, historique append-only, annulation. |
-| `demo-ready` | Reset, checks, remplissage de `/about`, `DEMO.md` scénarisé. |
+| `demo-ready` | Gel à la minute 28 : redémarrage après reset, parcours de chaque ligne du sujet, `/about` et `DEMO.md` vrais, `npm run verify` en dernier. |
 | `shadcn` | Skill officiel shadcn (`npx skills add shadcn/ui`). |
+
+## Avant tout : ce starter est-il autorisé ?
+
+Demander au recruteur, avant l'épreuve :
+- Peut-on arriver avec du code préparé (starter, composants) ? Avec des instructions préparées pour l'agent ?
+- La stack est-elle libre ? Le réseau et l'agent de son choix sont-ils autorisés ? L'installation compte-t-elle dans les 40 min ?
+
+Si le code préparé est interdit : garder seulement la **méthode** (kickoff, data-integrity, calendrier) en tête, et
+dire en ouverture d'épreuve ce qui était préparé. Dans tous les cas, savoir distinguer à l'oral ce qui vient du
+starter (shell, palette, thème) de ce qui a été construit pendant l'épreuve.
 
 ## Reproduire chez soi
 
-Prérequis : Node.js ≥ 20 (testé avec 22), npm, git, Codex CLI (`npm i -g @openai/codex`) ou un autre agent.
+Prérequis : **Node.js 22** (`.nvmrc`, `engines`; `better-sqlite3` 13 l'exige), npm, git,
+Codex CLI (`npm i -g @openai/codex`) ou un autre agent qui lit `AGENTS.md` et `.agents/skills`.
 
 ```bash
 git clone <ce-repo> mon-epreuve && cd mon-epreuve
-npm install
+npm ci                # versions verrouillées : le seul chemin reproductible
 npm run db:reset      # crée data/app.db et injecte les données de démo
-npm run check         # typecheck + lint
+npm run verify        # typecheck + lint + build de production
+npm run invariants    # script de preuve : chaque cas interdit → PASS/FAIL
 npm run dev           # http://localhost:3000 — tester Ctrl K et le thème
-codex                 # /skills doit lister kickoff, workflow-screens, ship-feature…
+codex                 # /skills doit lister kickoff, art-direction, workflow-screens…
 ```
+
+Vérification dans le navigateur : l'agent en a besoin pour la définition de « terminé ». Si votre agent ne pilote
+pas de navigateur, c'est au candidat de faire les parcours à la main (c'est d'ailleurs un bon moment à montrer).
 
 <details>
 <summary>Recréer from scratch</summary>
@@ -88,11 +130,12 @@ npx shadcn@latest init -b radix -p nova -y --no-monorepo
 npx shadcn@latest add -y button input label textarea select card table dialog alert-dialog badge \
   sonner chart form field tabs dropdown-menu separator skeleton sheet tooltip checkbox switch \
   popover calendar sidebar breadcrumb empty command kbd toggle-group progress hover-card scroll-area avatar
-npm i drizzle-orm better-sqlite3 zod es-toolkit date-fns server-only motion geist
+npm i drizzle-orm better-sqlite3 zod es-toolkit date-fns server-only motion geist \
+  @fontsource-variable/{bricolage-grotesque,fraunces,space-grotesk,instrument-sans,manrope,dm-sans,jetbrains-mono}
 npm i -D drizzle-kit @types/better-sqlite3 tsx
 npx skills add shadcn/ui -a codex -y --copy
-# puis copier depuis ce repo : AGENTS.md, .agents/skills/*, src/, drizzle.config.ts,
-# next.config.ts, eslint.config.mjs et les scripts db:* / typecheck / check de package.json
+# puis copier depuis ce repo : AGENTS.md, .agents/skills/*, scripts/, src/, drizzle.config.ts, .nvmrc,
+# next.config.ts (dont le loader @tailwindcss/turbopack), eslint.config.mjs et les scripts de package.json
 ```
 
 Pièges rencontrés :
@@ -112,29 +155,35 @@ Pièges rencontrés :
 | `npm run db:push` | applique `src/db/schema.ts` (pas de fichiers de migration) |
 | `npm run db:seed` / `db:reset` | réinjecte les données / recrée la base |
 | `npm run check` | typecheck + lint |
+| `npm run verify` | check + build : la porte finale |
+| `npm run invariants` | `scripts/check-invariants.ts` : tente chaque cas interdit sur une copie de la base |
 
-Après un `db:reset` avec le serveur lancé : redémarrer le serveur (la connexion SQLite garde l'ancien fichier).
+**Après un `db:reset`, redémarrer le serveur** : `db:reset` supprime le fichier que le serveur garde ouvert, qui
+afficherait sinon une base orpheline.
 
 ## Le jour J
 
-Prompt de départ (c'est tout) :
+Prompt de départ :
 
 ```text
-Épreuve chronométrée : 40 minutes maximum. Construis l'app décrite ci-dessous dans ce repo, en suivant
-AGENTS.md et les skills de .agents/skills. Travaille en autonomie complète.
+Épreuve chronométrée : 40 minutes. Construis l'app décrite ci-dessous dans ce repo, en suivant AGENTS.md et les
+skills de .agents/skills. Après SPEC.md, attends mon go ; ensuite travaille en autonomie.
 <coller le sujet>
 ```
 
+Calendrier unique (identique à `AGENTS.md`) :
+
 | Minutes | Candidat | Agent |
 |---|---|---|
-| 0–3 | Lit le sujet à voix haute, annonce la méthode : « je pars de la journée du gérant, pas des tables ». | `kickoff` : `SPEC.md` (journée, workflows, décisions). |
-| 3–5 | Relit `SPEC.md` à l'écran : commente la journée et 2–3 workflows retenus / rejetés. Corrige si besoin. | Démarre le workflow 1. |
-| 5–25 | Suit les commits, ouvre l'app après chaque workflow, verbalise ce qu'il vérifie, interrompt si l'agent boucle. | Workflows du sujet, puis document implicite (commande, inventaire). |
-| 25–32 | Essaie de casser l'app (survente, double annulation, SKU en double) devant l'examinateur. | Corrige ce qui casse. |
-| 32–40 | Démo en suivant `DEMO.md` et `/about`. | `demo-ready` fait. |
+| 0–5 | Lit le sujet à voix haute, annonce la méthode (« je pars de la journée de l'utilisateur, pas des tables »). Lit le résumé du SPEC, **choisit** le workflow prioritaire, l'invariant critique et ce qui est reporté, donne le go. | `kickoff` → `SPEC.md` + résumé en 6 lignes, puis attend. |
+| 5–8 | Commente la direction artistique choisie. | `art-direction`, suppression de l'exemple `tasks`. |
+| 8–22 | Ouvre l'app après chaque commit, verbalise ce qu'il vérifie, relit les diffs sensibles (transactions, contrôles), interrompt si l'agent boucle. | Workflows qui couvrent le sujet. |
+| 22–28 | Décide : extension de la phase 2 **ou** corrections. Renoncer à un bonus est une décision légitime, à dire. | Extension ou corrections. |
+| 28–32 | Gel. Lance `npm run invariants` devant l'examinateur, essaie de casser l'app. | `demo-ready`. |
+| 32–40 | Démo avec `DEMO.md` et `/about`. | Inactif. |
 
-Ce qui est évalué autant que le produit : découper avant de coder, relire et corriger l'IA à voix haute,
-tester les cas interdits, savoir expliquer chaque choix (la page `/about` sert d'antisèche).
+Garder une trace des corrections réellement demandées à l'IA pendant l'épreuve (deux ou trois exemples précis) :
+c'est la meilleure réponse à « usage critique de l'IA ».
 
 ## S'entraîner
 

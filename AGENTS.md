@@ -17,18 +17,22 @@ warn using what it knows (time, capacity, history, constraints), and show the do
 (timeline, slots, stages, plan), not as tables. It has its own visual identity tied to the domain.
 See `kickoff`, `art-direction`, `workflow-screens`. Quality comes from the hard rules below.
 
-## Pace
+## Pace (single timeline, minutes from the start of the interview)
 
-- Work autonomously: decide, note the assumption in `SPEC.md`, keep going. Never stop to ask.
-- `kickoff` (SPEC) in ≤ 6 min, then `art-direction` in ≤ 5 min, then workflows. Plain CRUD only as fallback.
-  Aim for 4–5 workflows; each has a before → after line in SPEC.md.
-- Use subagents/parallel work for independent slices when available (one owner per file).
-- `npm run check` after each slice; commit after each slice so a broken step never costs the demo.
-- **Use the time.** Runs with this starter finish the whole brief in 10–14 min. Never reject an idea "for time"
-  in SPEC.md; order it in phase 2. When the brief is covered and committed and more than 10 min remain, build the
-  next phase-2 workflow (customer-facing page, implied document, the app deciding more). Stop starting new slices
-  only when < 8 min remain, then run `demo-ready`.
-- At the end, stop any dev server you started and leave `npm run db:reset` state in place (the demo restarts the server).
+| min | phase | what happens |
+|---|---|---|
+| 0–5 | Frame | `kickoff` writes `SPEC.md`, then **STOP and wait for the candidate's go** (one message). The candidate picks the priority workflow, the critical invariant, and what is deferred. This is the only stop. |
+| 5–8 | Identity | `art-direction`. Remove the `tasks` example now (see `demo-ready` step 0), not at the end. |
+| 8–22 | Core | Brief-covering workflows, one slice = one commit, `npm run check` after each. |
+| 22–28 | Extend | Next item of SPEC "Phase 2" **only if** every brief line works in the browser. Otherwise fix. |
+| 28–32 | Freeze | `demo-ready`: no new features. Restart, reset, walk, check, build, commit. |
+| 32–40 | Demo | The candidate demos. The agent is idle. |
+
+- After the go, work autonomously: decide, note the assumption in `SPEC.md`, keep going.
+- Deferring a bonus is a legitimate decision; write it in SPEC "Phase 2" with the reason. Do not drop brief lines.
+- If an approach fails twice, cut the slice smaller or ask the candidate; do not loop.
+- Use subagents for independent slices when available (one owner per file; shared contracts first).
+- At the end, stop every dev server you started (including background services of your own harness).
 
 ## Commands
 
@@ -39,6 +43,10 @@ See `kickoff`, `art-direction`, `workflow-screens`. Quality comes from the hard 
 | `npm run db:seed` | reset + seed demo data (`src/db/seed.ts`) |
 | `npm run db:reset` | delete the DB, push, seed |
 | `npm run check` | typecheck + lint, MUST pass before saying "done" |
+| `npm run verify` | check + production build: the final gate |
+
+SQLite gotcha: `db:reset` deletes the file a running dev server holds open. **After any reset, restart the dev server**
+before looking at the app, or it shows an orphaned database.
 
 ## Stack
 
@@ -50,9 +58,10 @@ No other keyboard shortcuts: single-key shortcuts are undiscoverable in a demo a
 
 Adding a dependency is fine when it buys a visible feature (map: `maplibre-gl`; drag & drop: `@dnd-kit/core`;
 calendar views; PDF/QR…). Missing shadcn component: `npx shadcn@latest add <name>`, never hand-write one.
-`cacheComponents` is OFF in `next.config.ts` on purpose: every page reads SQLite at request time.
+Pages that read the DB at request time need `export const dynamic = "force-dynamic"` (see `src/app/page.tsx`); pages
+reading `searchParams` are dynamic automatically. `cacheComponents` is off to avoid Suspense/prerender constraints.
 
-## Architecture: copy `src/features/tasks`
+## Architecture: copy `src/features/tasks` (replace it with the real domain at minute 5–8)
 
 ```
 src/db/schema.ts                table + exported const enums + inferred type
@@ -71,24 +80,30 @@ src/app/about/page.tsx          methodology page: fill STACK/CHOICES/LIMITS at t
 
 ## Hard rules (these are what "clean" means here)
 
-- Reads in server components via `queries.ts`; aggregates in SQL, not JS loops. `route.ts` only for downloads (CSV, PDF).
-- Mutations are server actions returning `ActionState`; zod `safeParse` on the server, always. Error returns include
-  `values: formValues(formData)` and forms use `defaultValue={values.x}` (React 19 resets forms after an action).
+- Reads in server components via `queries.ts`; filter/aggregate in SQL. `route.ts` only for downloads (CSV, PDF).
+- Mutations are server actions; zod `safeParse` on the server, always, including ids and lookups. Single-form actions
+  return `ActionState` with `values: formValues(formData)`; batch actions take a typed object and return per-line errors.
+- Updates/deletes check `changes`: 0 rows affected is an error ("introuvable / déjà modifié"), never a success toast.
 - Multi-step writes go in ONE `db.transaction((tx) => ...)` (synchronous, no `await`). Invariants checked inside it,
-  backed by DB constraints (`unique`, `check`). See `data-integrity`.
-- State that a user would want to share or undo (filters, sort, tab, selected period) lives in the URL.
+  backed by DB constraints (`unique`, `check(...)`, including enum membership). See `data-integrity` for the
+  recurring traps (capacity, undo, double submit, time zone, codes, date validation).
+- State a user would want to share (filters, sort, tab, period) lives in the URL; the inputs reflect the URL.
 - Money in integer cents (`formatCurrency(cents / 100)`); dates as `integer({ mode: "timestamp" })` + date-fns.
-- UI: compose shadcn; semantic tokens only (works in dark mode); every list has an empty state; every chart and KPI is
-  clickable and leads to the filtered data.
+- UI: compose shadcn; semantic tokens only (works in dark mode); every list has an empty state; a KPI or chart that
+  links to a list uses **exactly the same filter** as its number.
 - UI copy in French. Code and comments in English; comment only a non-obvious why.
 - Every feature you build must be reachable in the demo: in the nav, the palette, or one click from a page.
+- Claims in `/about` and `DEMO.md` must be true of the final state; each "refused" claim is backed by a script in
+  `scripts/` that the candidate can run live (`npx tsx scripts/<name>.ts`).
 
 ## Done means
 
-1. `npm run check` passes and `npm run db:reset` seeds data that makes every screen look alive (60–200 rows,
-   spread over 90 days, including alert / empty / edge states).
-2. Every flow was exercised in the browser, not assumed.
-3. `/about` filled, `DEMO.md` written (`demo-ready`).
+1. `npm run verify` passes on the final state (after the last edit, not before).
+2. Dev server restarted after the final `db:reset`; every brief line exercised in the browser, including one rejected case.
+3. `/about` and `DEMO.md` true for this state (`demo-ready`).
+
+Seed volume: enough that each screen looks used and each workflow has something to do; include at least one edge
+state per invariant. Derive timestamps from one reference instant and respect every invariant (lead times, no future history).
 
 ## Skills (`.agents/skills`)
 

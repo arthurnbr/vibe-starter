@@ -43,8 +43,8 @@ action and shows the consequence before the user commits.
 ## 4. Then the usual
 
 - **Brief coverage**: every brief line mapped to where it lives (often inside a workflow; plain CRUD only as fallback).
-- **Scope**: a recent agent ships a brief in ~12 min. Plan 4–5 workflows, including at least one the brief implies but
-  does not name (a document, a schedule, a customer-facing side). Build brief-covering workflows first, commit, then the rest.
+- **Scope**: plan the brief-covering workflows first; list 1–2 extensions the job implies (a document, a schedule, a
+  customer-facing side) under Phase 2, built only if every brief line works by minute 22.
 - **Data model** that the new way of working needs; money in cents; constraints.
 - **Invariants**: rule → where enforced.
 - **Art direction**: 3 lines (mood, reference object, signature element), then apply `art-direction`.
@@ -67,8 +67,13 @@ domain object shown · what the app computes/decides · primary action · conseq
 ## Art direction
 ## Seed plan
 ## Demo storyline (the new day)
-## Phase 2 (built if time remains — never "rejected for time")
-## Rejected ideas (only for product reasons, never "not enough time")
+## Phase 2 (built only if the brief is fully working by minute 22)
+## Rejected ideas (and why)
 ```
 
-Do not wait for approval: write SPEC.md, apply art direction, then build workflows.
+## Checkpoint (the only stop)
+
+After writing SPEC.md, print a 6-line summary and **wait for one reply from the candidate**:
+1. the before → after you propose to lead with, 2. the workflows in build order (brief first), 3. the critical invariant and
+how it is enforced, 4. what goes to phase 2, 5. the art direction in one line, 6. assumptions that change the scope.
+The candidate confirms or redirects; then build without further questions.

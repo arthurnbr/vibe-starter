@@ -1,6 +1,7 @@
 "use client"
 
-import { useActionState, useEffect, useState } from "react"
+import { useActionState, useEffect, useRef, useState } from "react"
+import { usePathname, useRouter, useSearchParams } from "next/navigation"
 import { toast } from "sonner"
 import { Button } from "@/components/ui/button"
 import {
@@ -16,8 +17,20 @@ import { priorityLabel, statusLabel } from "./labels"
 
 export function TaskFormDialog({ task, trigger, defaultOpen = false }: { task?: Task; trigger: React.ReactNode; defaultOpen?: boolean }) {
   const [open, setOpen] = useState(defaultOpen)
+  const router = useRouter()
+  const pathname = usePathname()
+  const params = useSearchParams()
+  const onOpenChange = (next: boolean) => {
+    setOpen(next)
+    // Consume ?new=1 on close so the palette action can open the dialog again.
+    if (!next && params.has("new")) {
+      const rest = new URLSearchParams(params)
+      rest.delete("new")
+      router.replace(rest.size ? `${pathname}?${rest}` : pathname)
+    }
+  }
   return (
-    <Dialog open={open} onOpenChange={setOpen}>
+    <Dialog open={open} onOpenChange={onOpenChange}>
       <DialogTrigger asChild>{trigger}</DialogTrigger>
       <DialogContent>
         <DialogHeader>
@@ -25,7 +38,7 @@ export function TaskFormDialog({ task, trigger, defaultOpen = false }: { task?: 
           <DialogDescription>Les champs sont validés côté serveur.</DialogDescription>
         </DialogHeader>
         {/* Remount on open so the form state resets. */}
-        {open && <TaskForm task={task} onDone={() => setOpen(false)} />}
+        {open && <TaskForm task={task} onDone={() => onOpenChange(false)} />}
       </DialogContent>
     </Dialog>
   )
@@ -33,13 +46,18 @@ export function TaskFormDialog({ task, trigger, defaultOpen = false }: { task?: 
 
 function TaskForm({ task, onDone }: { task?: Task; onDone: () => void }) {
   const [state, action, pending] = useActionState(saveTask.bind(null, task?.id ?? null), initialActionState)
+  // Latest onDone without re-running the effect: it must fire once per action result, not once per render.
+  const done = useRef(onDone)
+  useEffect(() => {
+    done.current = onDone
+  })
 
   useEffect(() => {
     if (state.ok) {
       toast.success(state.message)
-      onDone()
+      done.current()
     } else if (state.message) toast.error(state.message)
-  }, [state, onDone])
+  }, [state])
 
   const errors = state.fieldErrors ?? {}
   const values = { ...task, ...state.values }

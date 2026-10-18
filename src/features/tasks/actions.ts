@@ -13,7 +13,11 @@ export async function saveTask(id: number | null, _prev: ActionState, formData: 
   if (!parsed.success) return invalid(parsed.error, values)
 
   if (id === null) db.insert(tasks).values(parsed.data).run()
-  else db.update(tasks).set(parsed.data).where(eq(tasks.id, id)).run()
+  else {
+    const { changes } = db.update(tasks).set(parsed.data).where(eq(tasks.id, id)).run()
+    // Deleted in another tab while the form was open: say so instead of a false success.
+    if (changes === 0) return { ok: false, message: "Cette tâche n'existe plus", values }
+  }
 
   revalidatePath("/", "layout")
   return { ok: true, message: id === null ? "Tâche créée" : "Tâche mise à jour" }

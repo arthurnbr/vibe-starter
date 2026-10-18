@@ -16,7 +16,7 @@ export default function DashboardPage() {
   })
   const kpis = [
     { label: "Tâches", value: formatNumber(stats.total), href: "/tasks" },
-    { label: "Heures restantes", value: `${formatNumber(stats.openHours)} h`, href: "/tasks?status=doing" },
+    { label: "Heures restantes", value: `${formatNumber(stats.openHours)} h`, href: "/tasks?status=open" },
     { label: "Terminées", value: formatNumber(chartData[2].count), href: "/tasks?status=done" },
   ]
 

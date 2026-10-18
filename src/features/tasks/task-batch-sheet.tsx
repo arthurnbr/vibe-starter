@@ -10,7 +10,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { Table, TableBody, TableCell, TableFooter, TableHead, TableHeader, TableRow } from "@/components/ui/table"
 import { TASK_PRIORITIES, type Task } from "@/db/schema"
 import { createTasksBatch } from "./batch-actions"
-import type { BatchState } from "./batch"
+import { MAX_BATCH_LINES, type BatchState } from "./batch"
 import { priorityLabel } from "./labels"
 
 type Line = { key: number; title: string; priority: Task["priority"]; estimateHours: number }
@@ -22,12 +22,14 @@ export function TaskBatchSheet() {
   const nextKey = useRef(0)
   const [draft, setDraft] = useState("")
   const [lines, setLines] = useState<Line[]>([])
-  const [errors, setErrors] = useState<BatchState["lineErrors"]>({})
+  const [errors, setErrors] = useState<NonNullable<BatchState["lineErrors"]>>({})
   const [pending, startTransition] = useTransition()
+  // Set synchronously on click: `pending` only flips on the next render, too late to stop a fast double submit.
+  const submitting = useRef(false)
 
   const add = () => {
     const title = draft.trim()
-    if (!title) return
+    if (!title || lines.length >= MAX_BATCH_LINES) return
     setLines((current) => [...current, { key: nextKey.current++, title, priority: "medium", estimateHours: 1 }])
     setDraft("")
     input.current?.focus()
@@ -35,21 +37,25 @@ export function TaskBatchSheet() {
   const update = (key: number, patch: Partial<Line>) =>
     setLines((current) => current.map((line) => (line.key === key ? { ...line, ...patch } : line)))
 
-  const submit = () =>
+  const submit = () => {
+    if (submitting.current) return
+    submitting.current = true
     startTransition(async () => {
-      const result = await createTasksBatch({
-        lines: lines.map(({ title, priority, estimateHours }) => ({ title, priority, estimateHours, status: "todo" })),
-      })
+      const result = await createTasksBatch({ lines: lines.map((line) => ({ ...line, status: "todo" })) })
       setErrors(result.lineErrors ?? {})
-      if (!result.ok) return void toast.error(result.message)
+      if (!result.ok) {
+        submitting.current = false
+        return void toast.error(result.message)
+      }
       toast.success(result.message)
-      setLines([])
       router.push("/tasks")
     })
+  }
 
   const totalHours = lines.reduce((sum, line) => sum + line.estimateHours, 0)
   return (
-    <div className="flex flex-col gap-4">
+    // fieldset disabled locks every input while saving, so nothing typed during the request is silently lost.
+    <fieldset disabled={pending} className="flex flex-col gap-4">
       <div className="flex gap-2">
         <Input
           ref={input}
@@ -79,11 +85,11 @@ export function TaskBatchSheet() {
                 </TableCell>
               </TableRow>
             )}
-            {lines.map((line, i) => (
+            {lines.map((line) => (
               <TableRow key={line.key}>
                 <TableCell>
-                  <Input value={line.title} onChange={(e) => update(line.key, { title: e.target.value })} aria-invalid={!!errors?.[`lines.${i}.title`]} />
-                  {errors?.[`lines.${i}.title`] && <p className="mt-1 text-xs text-destructive">{errors[`lines.${i}.title`]}</p>}
+                  <Input value={line.title} onChange={(e) => update(line.key, { title: e.target.value })} aria-invalid={!!errors[line.key]?.title} />
+                  {errors[line.key]?.title && <p className="mt-1 text-xs text-destructive">{errors[line.key].title}</p>}
                 </TableCell>
                 <TableCell>
                   <Select value={line.priority} onValueChange={(v) => update(line.key, { priority: v as Line["priority"] })}>
@@ -94,7 +100,8 @@ export function TaskBatchSheet() {
                   </Select>
                 </TableCell>
                 <TableCell>
-                  <Input type="number" min={1} value={line.estimateHours} onChange={(e) => update(line.key, { estimateHours: Number(e.target.value) })} aria-invalid={!!errors?.[`lines.${i}.estimateHours`]} />
+                  <Input type="number" min={1} value={line.estimateHours} onChange={(e) => update(line.key, { estimateHours: Number(e.target.value) })} aria-invalid={!!errors[line.key]?.estimateHours} />
+                  {errors[line.key]?.estimateHours && <p className="mt-1 text-xs text-destructive">{errors[line.key].estimateHours}</p>}
                 </TableCell>
                 <TableCell>
                   <Button variant="ghost" size="icon" aria-label="Retirer la ligne" onClick={() => setLines((c) => c.filter((l) => l.key !== line.key))}>
@@ -106,7 +113,7 @@ export function TaskBatchSheet() {
           </TableBody>
           <TableFooter>
             <TableRow>
-              <TableCell>{lines.length} ligne(s)</TableCell>
+              <TableCell>{lines.length} / {MAX_BATCH_LINES} ligne(s)</TableCell>
               <TableCell />
               <TableCell className="tabular-nums">{totalHours} h</TableCell>
               <TableCell />
@@ -119,6 +126,6 @@ export function TaskBatchSheet() {
           {pending ? "Enregistrement…" : `Créer ${lines.length} tâche(s)`}
         </Button>
       </div>
-    </div>
+    </fieldset>
   )
 }

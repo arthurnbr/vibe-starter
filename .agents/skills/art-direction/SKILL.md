@@ -46,6 +46,7 @@ domain**. Decide once, encode it in `src/app/globals.css` + `layout.tsx`, then b
 
 ## Do not
 
-- Ship the default neutral palette, Geist everywhere, or `bg-white` cards on `bg-gray-50`.
+- Ship the untouched default theme. A sober, neutral direction is fine when chosen on purpose (e.g. clinical, legal):
+  then the identity comes from typography, density and one signature element.
 - Add gradients, glassmorphism or emoji as a substitute for a direction.
 - Spend more than 5 minutes: decide, encode, move on. Every later screen uses the tokens, never raw colors.

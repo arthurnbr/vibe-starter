@@ -19,7 +19,8 @@ Show the thing the user thinks in, so constraints become visible and decisions o
   printable, with what to start first.
 - **Gauge / runway** for a resource (oven, stock, budget, seats) over time, showing when it breaks.
 - **Map or floor plan** when space matters (tables, shelves, zones).
-Tables remain for search/admin, never as the main screen of a workflow.
+Use a visual model when the domain has time, capacity, stages or space. When the job really is "find and compare
+records" (catalogue, analytics, audit), a good table with search, sort and inline actions *is* the right surface.
 
 ### 0b. The app decides, the user confirms
 - Allocation: the app proposes the slot, the route, the batch, the person; the user accepts or drags to change.

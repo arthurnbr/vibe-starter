@@ -9,9 +9,9 @@ const STACK = [
   { layer: "Graphiques", tech: "Recharts via shadcn chart", why: "Thème cohérent, clic sur une barre = filtre.", rejected: "Chart.js : style à refaire." },
 ]
 const CHOICES = [
-  { title: "État dans l'URL", body: "Filtres, tri et recherche vivent dans l'URL : lien partageable, bouton Précédent = annuler." },
+  { title: "État dans l'URL", body: "Filtres et recherche vivent dans l'URL : lien partageable, survit au rafraîchissement." },
   { title: "Validation côté serveur", body: "Un schéma zod par entité, appliqué dans chaque action serveur ; la base ajoute ses contraintes." },
-  { title: "Clavier d'abord", body: "Ctrl K pour tout chercher, g + lettre pour naviguer, n pour créer." },
+  { title: "Preuves rejouables", body: "npm run invariants tente chaque cas interdit sur une copie de la base et affiche PASS/FAIL." },
 ]
 const LIMITS = ["Pas d'authentification : application interne mono-utilisateur."]
 
