@@ -17,6 +17,13 @@ One slice = one thing a persona can do in the demo. Finish it end-to-end, commit
 6. **UI**: server page + client islands for interactivity. Empty state, inline consequences, one clear primary action.
 7. **Reachability**: page in `src/lib/nav.ts`, entity in `src/lib/search.ts`, primary actions in palette `ACTIONS`.
 8. **Seed**: extend `src/db/seed.ts` so the workflow has something real to do. `npm run db:reset`.
-9. **Verify**: `npm run check`, run the workflow in the browser including one rejected case, `git commit`.
+9. **E2E** (`e2e/app.spec.ts`, copy the existing tests): add the page to `PAGES` (load + click audit), and one journey
+   test for the workflow: the happy path asserted on what the user sees, plus one refused case. Use roles and visible
+   text (`getByRole`, `getByText`), never CSS classes. Run `npx playwright test -g "<name>"`.
+10. **Verify**: `npm run check`, then `git commit`.
+
+Interactive elements: a chart click handler goes on the shape (`<Bar onClick={(_, index) => …}>`), never on the chart
+(`<BarChart onClick>` reads the hovered item: wrong target or dead on touch). A button that cannot act is `disabled`,
+never a silent no-op. Anything with `cursor-pointer` must be a real link or button.
 
 If a step fails twice, cut the slice smaller instead of looping.

@@ -65,7 +65,8 @@ export function TaskBatchSheet() {
           onChange={(e) => setDraft(e.target.value)}
           onKeyDown={(e) => e.key === "Enter" && (e.preventDefault(), add())}
         />
-        <Button variant="outline" onClick={add}>Ajouter</Button>
+        {/* Disabled (not silently ignored) when there is nothing to add: a button that does nothing is a dead click. */}
+        <Button variant="outline" onClick={add} disabled={!draft.trim() || lines.length >= MAX_BATCH_LINES}>Ajouter</Button>
       </div>
       <div className="rounded-lg border">
         <Table>

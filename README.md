@@ -42,6 +42,11 @@ Conclusions :
 10. **Le plafond de qualité est maintenant la complétude du jour 2**, plus les idées : ce qui manque est ce qu'un
    utilisateur rencontre le lendemain (modifier, annuler, chercher ce qui est imprimé, écrans partagés à jour).
    Ces points sont dans `workflow-screens` §7 et dans `data-integrity`.
+11. **« Ça marche chez l'agent » ne suffit pas : il faut un contrôle navigateur automatique.** Sur Rayon, les 6 barres
+   du graphique de l'accueil menaient toutes au même endroit (le gestionnaire lisait « l'élément survolé » au lieu de
+   la barre cliquée). Ni l'agent, ni le jury, ni moi ne l'avions vu. `npm run e2e` clique désormais chaque élément de
+   chaque page sans survol préalable et échoue sur tout clic mort ou mal routé ; sur Rayon il a retrouvé ce bug et
+   un second (« Copier le SMS » de l'atelier ne fait rien hors HTTPS : pas de solution de secours, contrairement à la fiche).
 
 ## Critique externe (agents sans contexte, sur Fournil et sur ce starter)
 
@@ -119,6 +124,7 @@ npm ci                # versions verrouillées : le seul chemin reproductible
 npm run db:reset      # crée data/app.db et injecte les données de démo
 npm run verify        # typecheck + lint + build de production
 npm run invariants    # script de preuve : chaque cas interdit → PASS/FAIL
+npm run e2e           # Playwright : pages, audit de clics, parcours (~1 min)
 npm run dev           # http://localhost:3000 — tester Ctrl K et le thème
 codex                 # /skills doit lister kickoff, art-direction, workflow-screens…
 ```
@@ -164,6 +170,7 @@ Pièges rencontrés :
 | `npm run check` | typecheck + lint |
 | `npm run verify` | check + build : la porte finale |
 | `npm run invariants` | `scripts/check-invariants.ts` : tente chaque cas interdit sur une copie de la base |
+| `npm run e2e` | Playwright sur une base réinitialisée et un build de prod : chaque page se charge sans erreur, **chaque élément cliquable de chaque page fait quelque chose** (clic réel, sans survol ; aucun clic mort ni plusieurs barres d'un graphique vers la même cible), chaque parcours métier passe avec un cas refusé. Navigateur : `npx playwright install chromium` une fois. |
 
 **Après un `db:reset`, redémarrer le serveur** : `db:reset` supprime le fichier que le serveur garde ouvert, qui
 afficherait sinon une base orpheline.
@@ -186,7 +193,7 @@ Calendrier unique (identique à `AGENTS.md`) :
 | 5–8 | Commente la direction artistique choisie. | `art-direction`, suppression de l'exemple `tasks`. |
 | 8–22 | Ouvre l'app après chaque commit, verbalise ce qu'il vérifie, relit les diffs sensibles (transactions, contrôles), interrompt si l'agent boucle. | Workflows qui couvrent le sujet. |
 | 22–28 | Décide : extension de la phase 2 **ou** corrections. Renoncer à un bonus est une décision légitime, à dire. | Extension ou corrections. |
-| 28–32 | Gel. Lance `npm run invariants` devant l'examinateur, essaie de casser l'app. | `demo-ready`. |
+| 28–32 | Gel. Lance `npm run invariants` et `npm run e2e` devant l'examinateur, essaie de casser l'app. | `demo-ready`. |
 | 32–40 | Démo avec `DEMO.md` et `/about`. | Inactif. |
 
 Garder une trace des corrections réellement demandées à l'IA pendant l'épreuve (deux ou trois exemples précis) :

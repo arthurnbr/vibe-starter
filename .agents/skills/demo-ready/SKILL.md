@@ -14,11 +14,13 @@ description: >-
 1. No new features from here. Only fixes.
 2. Update `src/app/about/page.tsx` (STACK with rejected alternatives, CHOICES, LIMITS, how AI output was checked)
    and write `DEMO.md`. Every claim must match the code: no feature that was removed, no guarantee without a test.
-3. Run `npx tsx scripts/check-invariants.ts` (see `data-integrity`); all PASS.
-4. Stop the dev server → `npm run db:reset` → start the dev server again.
-5. Walk every brief line and every workflow in the browser, including one rejected case each, at the current time
-   of day (do not script the demo around a specific hour: "today", "late", "full" depend on now).
-6. `npm run verify` (check + build) as the very last command. If anything changes after it, run it again.
+3. `npm run invariants`: all PASS.
+4. `npm run e2e`: all green. It resets the DB, builds, and runs on its own port, so it tests exactly what is demoed:
+   every page loads without console error, **every clickable element on every page does something** (no dead or
+   misrouted click), and every workflow journey passes. A red click audit is a demo bug: fix it, never skip it.
+5. Stop the dev server → `npm run db:reset` → start it again; take a last look at the landing page and the main
+   workflow at the current time of day ("today", "late", "full" depend on now).
+6. `npm run verify` as the very last command. If anything changes after it, run 3–6 again.
 7. Commit. Stop every server you started.
 
 `DEMO.md`:

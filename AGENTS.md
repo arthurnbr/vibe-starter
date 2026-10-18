@@ -23,9 +23,9 @@ See `kickoff`, `art-direction`, `workflow-screens`. Quality comes from the hard 
 |---|---|---|
 | 0–5 | Frame | `kickoff` writes `SPEC.md`, then **STOP and wait for the candidate's go** (one message). The candidate picks the priority workflow, the critical invariant, and what is deferred. This is the only stop. |
 | 5–8 | Identity | `art-direction`. Remove the `tasks` example now (see `demo-ready` step 0), not at the end. |
-| 8–22 | Core | Brief-covering workflows, one slice = one commit, `npm run check` after each. |
-| 22–28 | Extend | Next item of SPEC "Phase 2" **only if** every brief line works in the browser. Otherwise fix. |
-| 28–32 | Freeze | `demo-ready`: no new features. Restart, reset, walk, check, build, commit. |
+| 8–22 | Core | Brief-covering workflows, one slice = one commit. After each slice: `npm run check` + its e2e journey. |
+| 22–28 | Extend | Next item of SPEC "Phase 2" **only if** `npm run e2e` is green. Otherwise fix. |
+| 28–32 | Freeze | `demo-ready`: no new features. Invariants, e2e, verify, commit. |
 | 32–40 | Demo | The candidate demos. The agent is idle. |
 
 - After the go, work autonomously: decide, note the assumption in `SPEC.md`, keep going.
@@ -44,6 +44,8 @@ See `kickoff`, `art-direction`, `workflow-screens`. Quality comes from the hard 
 | `npm run db:reset` | delete the DB, push, seed |
 | `npm run check` | typecheck + lint, MUST pass before saying "done" |
 | `npm run verify` | check + production build: the final gate |
+| `npm run e2e` | Playwright on a fresh reset + production build: every page loads, **no dead click on any page**, each workflow journey passes (~1 min) |
+| `npm run invariants` | `scripts/check-invariants.ts`: forbidden cases against the real write code + global DB assertions |
 
 SQLite gotcha: `db:reset` deletes the file a running dev server holds open. **After any reset, restart the dev server**
 before looking at the app, or it shows an orphaned database.
@@ -98,8 +100,9 @@ src/app/about/page.tsx          methodology page: fill STACK/CHOICES/LIMITS at t
 
 ## Done means
 
-1. `npm run verify` passes on the final state (after the last edit, not before).
-2. Dev server restarted after the final `db:reset`; every brief line exercised in the browser, including one rejected case.
+1. `npm run invariants`, `npm run e2e` and `npm run verify` pass on the final state (after the last edit, not before).
+2. Every brief line has an e2e journey in `e2e/app.spec.ts`, including one rejected case; every page is in `PAGES`
+   so the click audit covers it.
 3. `/about` and `DEMO.md` true for this state (`demo-ready`).
 
 Seed volume: enough that each screen looks used and each workflow has something to do; include at least one edge
