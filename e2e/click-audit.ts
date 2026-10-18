@@ -6,6 +6,7 @@ const CLICKABLE = [
   "main button:not([disabled])",
   "main [role=button]",
   "main [role=link]",
+  "main summary",
   "main .recharts-bar-rectangle",
   "main .recharts-sector",
   "main [data-clickable]",
@@ -46,7 +47,8 @@ export async function auditClicks(page: Page, path: string, opts: { skip?: RegEx
     const seen = new Set<string>()
     return nodes.flatMap((n, index) => {
       const r = n.getBoundingClientRect()
-      if (!r.width || !r.height) return []
+      // Collapsed <details> content keeps a layout box in Chrome but is not shown: only audit what a user can see.
+      if (!r.width || !r.height || !n.checkVisibility({ visibilityProperty: true, opacityProperty: true })) return []
       const label = ((n as HTMLElement).innerText || n.getAttribute("aria-label") || "").trim()
       const kind = n.closest("tbody tr") ? `${n.tagName}|row|${label.replace(/\S+$/, "")}` : `${n.tagName}|${n.getAttribute("href") ?? ""}|${label}|${index}`
       if (seen.has(kind)) return []
@@ -69,12 +71,28 @@ export async function auditClicks(page: Page, path: string, opts: { skip?: RegEx
       (n) => n.getAttribute("aria-current") || n.getAttribute("aria-pressed") === "true" || n.getAttribute("aria-selected") === "true" || n.getAttribute("data-state") === "on" || n.getAttribute("data-active") === "true",
     )
     if (current) continue
+    // tel:, sms:, mailto: hand over to another app: nothing to observe in the page, a valid href is the contract.
+    const handoff = await el.evaluate((n) => /^(tel|sms|mailto):.+/.test(n.getAttribute("href") ?? ""))
+    if (handoff) {
+      ok.push({ label, effect: "handoff" })
+      continue
+    }
     await el.scrollIntoViewIfNeeded()
     const box = await el.boundingBox()
     if (!box) continue
     const before = { url: page.url(), html: await page.locator("body").innerHTML() }
+    // A link opening a new tab is alive if the tab opens: count popups for this click.
+    let popup = false
+    const onPopup = () => (popup = true)
+    page.context().once("page", onPopup)
     await page.mouse.click(box.x + box.width / 2, box.y + box.height / 2)
     await page.waitForTimeout(500)
+    page.context().off("page", onPopup)
+    if (popup) {
+      for (const extra of page.context().pages().filter((p) => p !== page)) await extra.close()
+      ok.push({ label, effect: "new tab" })
+      continue
+    }
     const overlay = await page.locator("[role=dialog], [role=alertdialog], [role=menu], [role=listbox], [data-sonner-toast]").count()
     const changed = page.url() !== before.url || overlay > 0 || (await page.locator("body").innerHTML()) !== before.html
     const outcome = { label, effect: page.url() !== before.url ? `→ ${new URL(page.url()).pathname}${new URL(page.url()).search}` : overlay ? "overlay" : changed ? "dom" : "NOTHING" }
