@@ -69,6 +69,11 @@ records" (catalogue, analytics, audit), a good table with search, sort and inlin
 ### 6. Smart defaults and guards
 - Default date = today, default reason from context (sale sheet → vente), last-used supplier, quantity = pack size.
 - Inline consequences before submit (stock after, price change impact), not only server errors after.
+- **A disabled submit says why**, next to the button ("Téléphone : 10 chiffres", "Choisir au moins un outil").
+  Live previews apply the server's bounds (no negative amount shown as a refund, no date past the max).
+- **French input**: number fields are text inputs with `inputMode="decimal"` (a `type="number"` field turns "2,5"
+  into 25 in a non-French browser) parsed by `frenchNumber` (`src/lib/text.ts`); every message is French (import
+  zod from `@/lib/zod`, which sets the French locale).
 - Undo for destructive or bulk actions via toast with a compensating server action.
 
 ### 7. Real-life completeness (what users hit on day 2)

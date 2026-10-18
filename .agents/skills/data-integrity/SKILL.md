@@ -34,10 +34,14 @@ description: >-
 - **Human codes from a sequence** (`F-0123` from the row id or a counter), never from truncated `Date.now()`.
 - **Validate calendar dates**, not just their shape: `z.iso.date()` / `isValid(parseISO(x))`, then a fallback, never a 500.
 - **Upper bounds too**: max date ahead, max quantity, max lines; mirror them in the UI.
-- **Normalise identifiers once** (phone → E.164 digits, search → lowercase without accents) at write time, and query
-  the normalised column.
+- **Normalise identifiers once**: phone → E.164 digits; text search and name uniqueness through `searchKey()`
+  (`src/lib/text.ts`, also the SQL function `search_key()`): lowercase **without accents**. SQLite `lower()` leaves
+  "É" untouched, so `lower(name) like` misses "Émilie". Copy `titleMatches` in `src/features/tasks/queries.ts`.
 - **Statuses with distinct meanings stay distinct** in alerts and KPIs ("late to prepare" vs "ready, not collected";
-  "booked revenue" vs "collected revenue").
+  "booked revenue" vs "collected revenue"; "reserved" vs "physically out" for an occupancy rate).
+- **Money already taken is never rewritten.** Editing a paid record (extend, add a line, early return) creates a
+  balance to collect or refund, shown where the user acts and traced as a payment row; "encaissé" KPIs and receipts
+  sum payment rows, never the recomputed total.
 
 - **No silent overwrite of shared records**: a known phone with a different name asks "update the name or new
   contact?"; never rename every past record in passing.

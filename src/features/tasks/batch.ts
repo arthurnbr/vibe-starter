@@ -1,4 +1,4 @@
-import { z } from "zod"
+import { z } from "@/lib/zod"
 import { taskInput } from "./validation"
 
 export const MAX_BATCH_LINES = 50

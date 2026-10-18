@@ -23,10 +23,13 @@ See `kickoff`, `art-direction`, `workflow-screens`. Quality comes from the hard 
 |---|---|---|
 | 0–5 | Frame | `kickoff` writes `SPEC.md`, then **STOP and wait for the candidate's go** (one message). The candidate picks the priority workflow, the critical invariant, and what is deferred. This is the only stop. |
 | 5–8 | Identity | `art-direction`. Remove the `tasks` example now (see `demo-ready` step 0), not at the end. |
-| 8–22 | Core | Brief-covering workflows, one slice = one commit. After each slice: `npm run check` + its e2e journey. |
-| 22–28 | Extend | Next item of SPEC "Phase 2" **only if** `npm run e2e` is green. Otherwise fix. |
-| 28–32 | Freeze | `demo-ready`: no new features. Invariants, e2e, verify, commit. |
+| 8–22 | Core | Brief-covering workflows, one slice = one commit. After each slice: `npm run check` + **only its own** e2e journey (`npx playwright test -g "<journey>"`). |
+| 22–28 | Extend | Next item of SPEC "Phase 2", then stop at 28 even if unfinished (revert it). |
+| 28–32 | Freeze | `demo-ready`: no new features. Invariants, then the **full** `npm run e2e` **once** (≈ 5 min: start it in the background and write `/about` + `DEMO.md` meanwhile), verify, commit. A red test → rerun only that test (`-g`), never the whole suite. |
 | 32–40 | Demo | The candidate demos. The agent is idle. |
+
+**The clock is the hard limit.** A run that is correct at minute 52 fails the interview. Check the time (`date`)
+at each commit; at minute 28 freeze whatever is done.
 
 - After the go, work autonomously: decide, note the assumption in `SPEC.md`, keep going.
 - Deferring a bonus is a legitimate decision; write it in SPEC "Phase 2" with the reason. Do not drop brief lines.
@@ -84,6 +87,8 @@ src/features/tasks/task-batch-sheet.tsx + batch*.ts  reference batch screen: lin
 src/app/<route>/page.tsx        async server page: parse searchParams with zod, call queries, render
 src/lib/nav.ts                  one line per page → sidebar + palette
 src/lib/search.ts               one block per entity → global search in the palette
+src/lib/text.ts                 searchKey() (accent-free search/uniqueness, SQL search_key()), frenchNumber() ("12,5")
+src/lib/zod.ts                  import zod from here: French error messages by default
 src/components/command-palette.tsx  ACTIONS: one line per global action (create, export…)
 src/app/about/page.tsx          methodology page: fill STACK/CHOICES/LIMITS at the end
 ```

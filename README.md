@@ -7,7 +7,7 @@ des charges d'un CRUD en une douzaine de minutes. Ce qui distingue en démo, ce 
 vernis (palette, thème sombre) : ce sont des écrans **en forme de tâche** qui font gagner du temps ou évitent une
 erreur à l'utilisateur, sur des données cohérentes. Le repo est réglé pour ça.
 
-## Ce qu'on a appris (6 essais, 3 sujets)
+## Ce qu'on a appris (7 essais, 4 sujets)
 
 | Essai | Config | Temps | Résultat | Critique |
 |---|---|---|---|---|
@@ -17,6 +17,7 @@ erreur à l'utilisateur, sur des données cohérentes. Le repo est réglé pour 
 | Run 3 | `kickoff` = journée de l'utilisateur → workflows ; skill `workflow-screens` ; écran de saisie multi-lignes de référence | 13 min 30 | Accueil « À traiter », réassort → réception pré-remplie de 11 lignes en une transaction, saisie du soir multi-lignes, inventaire attendu / compté. | Les écrans suivent le métier, mais **digitalisent le processus actuel** ; trop de raccourcis clavier une touche ; look shadcn gris par défaut. |
 | Run 4 (**nouveau sujet : Fournil**, boulangerie) | `kickoff` = « réinventer, pas digitaliser » (avant → après) ; skill `art-direction` + polices hors ligne ; raccourcis supprimés sauf Ctrl K ; patterns de vues du domaine | 10 min 40 | **Identité** : ticket kraft, Fraunces + DM Sans + mono, croûte dorée / farine / framboise. **Journée** = frise des créneaux avec charge (17 h complet en rouge) + colonnes à préparer → prête → retirée, non-retirés à rappeler en tête. **Commande** : téléphone → client reconnu, « reprendre sa dernière commande » ; créneaux passés/complets désactivés, produits grisés avec « possible dès mar. 16 h » ; acompte suggéré. **Fournée** du jour calculée, triée par premier retrait, imprimable. Ticket imprimable. | L'app **change la façon de faire** (l'app refuse avant le client, calcule la production, lisse les retraits). Reste : page client publique rejetée « hors délai » alors qu'il restait 29 min → règle « use the time » ajoutée. |
 | Run 5 (**nouveau sujet : Rayon**, atelier vélo) — protocole post-critique : arrêt après SPEC, calendrier unique, script de preuves | candidat (moi) au point d'arrêt : priorité « dépôt à date tenable + suivi client », règle « attente de pièce libère la capacité », alerte « promesses en danger » | 15 min 20 (arrêt de 1 min inclus) | **Dépôt** : téléphone → client reconnu avec historique, prix et durée en direct, **jauges de charge sur 12 jours** (2 mécaniciens × 7 h), première date tenable proposée, jours pleins barrés et refusés par le serveur. **Ticket** étiquette kraft avec QR. **Atelier** en colonnes par statut, badges « en retard » / « jour surchargé », « Replanifier » au premier jour libre, « Pièce reçue » qui revérifie et décale la promesse. **SMS prêt** pré-rédigé. **Page client publique** `/suivi/<code>` mobile. 18 invariants PASS, verify vert, aucun serveur laissé. | **Jury sans contexte : 15/20, « embaucher »** (« la promesse de date est une vraie règle, pas une aide visuelle »). Défauts : client renommé en silence, « pièce reçue » qui garde une date pleine faute d'alternative, QR vers `localhost`, recherche impossible par n° de ticket, réparation non modifiable après dépôt, retards ignorés par la charge, script de preuves partiel. **Transformés en règles génériques** (data-integrity, workflow-screens §7). |
+| Run 6 (**nouveau sujet : Outilthèque**, location d'outils) — starter avec tous les correctifs (audit de clics e2e, tests par l'IP réseau, `newRequestId`) | candidat (moi) au point d'arrêt : priorité « comptoir du jour », jour de fin occupé, retour anticipé qui libère, retard signalé non facturé | ≈ 52 min d'agent (SPEC 3 min, code 30 min, preuves + e2e 19 min), **sans aucune retouche** | **Comptoir du jour** (départs / retours / retards ; caution encaissée, rendue ou retenue avec motif obligatoire ; conflit « le Kärcher en retard est attendu demain par Mme Diallo »). **Disponibilité par jour, retards compris** : une seule règle partout (formulaire, serveur, planning, preuves) ; modèle complet barré avec « Décaler au … » ou alternative. Planning 14 jours en panneau perforé, coffre des cautions, catalogue avec garde-fous, contrat imprimable, « à prévenir la veille ». 50 invariants PASS, **e2e 34/34**. | **Jury sans contexte : 16/20, « embaucher »**. Défauts : prolonger une location recalcule le total, donc « encaissé » et le contrat gonflent sans encaissement ; recherche aveugle aux accents (« Émilie ») ; occupation qui compte les réservations comme sorties ; doublon de modèle par la casse ; « 12,5 » refusé avec un message anglais ; bouton désactivé sans raison ; aperçu de retenue négative. **Transformés en helpers et règles** (`searchKey`, `frenchNumber`, zod français, data-integrity, workflow-screens §6). |
 
 Conclusions :
 1. **Concevoir à partir des données donne un carnet de notes**, même avec beaucoup de features. Le levier qui a
@@ -51,6 +52,14 @@ Conclusions :
    tests en local, mais ouvert par Tailscale **aucun bouton ni graphique ne réagissait** : `next dev` bloque ses
    scripts pour toute origine autre que `localhost`. Corrigé dans `next.config.ts` (`allowedDevOrigins` = IPs de la
    machine), et la démo se fait désormais sur `npm run demo` (build de production), vérifiée depuis l'IP réseau.
+13. **Le starter complet tient sans retouche, mais pas dans les 40 minutes** (run 6, 16/20). L'agent a écrit ses
+   parcours e2e, l'audit de clics a trouvé seul deux clics morts, le script d'invariants a trouvé seul un bug de
+   disponibilité. Coût : ≈ 52 min, dont ≈ 20 de preuves : l'e2e complet dure ≈ 5 min sur une app de cette taille
+   (l'audit clique chaque élément), et l'agent l'a relancé en entier après chaque correction. D'où la règle :
+   relancer **seulement le test rouge** (`-g`), l'e2e complet une fois au gel. Les défauts restants sont des oublis
+   « jour 2 » d'un logiciel français (accents, virgule décimale, messages en anglais) et un piège d'argent (modifier
+   une location payée réécrit l'encaissé) : ils sont maintenant des helpers (`src/lib/text.ts`, `src/lib/zod.ts`) et
+   des règles. **Le jour J, le candidat doit tenir le calendrier**, quitte à arrêter la phase 2.
 
 ## Critique externe (agents sans contexte, sur Fournil et sur ce starter)
 

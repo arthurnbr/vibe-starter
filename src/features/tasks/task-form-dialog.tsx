@@ -91,7 +91,8 @@ function TaskForm({ task, onDone }: { task?: Task; onDone: () => void }) {
         </div>
         <Field data-invalid={!!errors.estimateHours}>
           <FieldLabel htmlFor="estimateHours">Estimation (h)</FieldLabel>
-          <Input id="estimateHours" name="estimateHours" type="number" min={1} defaultValue={values.estimateHours ?? 1} aria-invalid={!!errors.estimateHours} />
+          {/* Text + inputMode, not type="number": in a non-French browser, typing "2,5" there silently becomes 25. */}
+          <Input id="estimateHours" name="estimateHours" inputMode="decimal" defaultValue={values.estimateHours ?? 1} aria-invalid={!!errors.estimateHours} />
           <FieldError>{errors.estimateHours?.[0]}</FieldError>
         </Field>
         <DialogFooter>
