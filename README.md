@@ -47,6 +47,10 @@ Conclusions :
    la barre cliquée). Ni l'agent, ni le jury, ni moi ne l'avions vu. `npm run e2e` clique désormais chaque élément de
    chaque page sans survol préalable et échoue sur tout clic mort ou mal routé ; sur Rayon il a retrouvé ce bug et
    un second (« Copier le SMS » de l'atelier ne fait rien hors HTTPS : pas de solution de secours, contrairement à la fiche).
+12. **Tester depuis l'adresse où l'utilisateur ouvrira l'app, pas depuis `localhost`.** Rayon corrigé passait tous ses
+   tests en local, mais ouvert par Tailscale **aucun bouton ni graphique ne réagissait** : `next dev` bloque ses
+   scripts pour toute origine autre que `localhost`. Corrigé dans `next.config.ts` (`allowedDevOrigins` = IPs de la
+   machine), et la démo se fait désormais sur `npm run demo` (build de production), vérifiée depuis l'IP réseau.
 
 ## Critique externe (agents sans contexte, sur Fournil et sur ce starter)
 
@@ -125,7 +129,8 @@ npm run db:reset      # crée data/app.db et injecte les données de démo
 npm run verify        # typecheck + lint + build de production
 npm run invariants    # script de preuve : chaque cas interdit → PASS/FAIL
 npm run e2e           # Playwright : pages, audit de clics, parcours (~1 min)
-npm run dev           # http://localhost:3000 — tester Ctrl K et le thème
+npm run dev           # http://localhost:3000 (ou l'IP de la machine depuis un autre appareil) — tester Ctrl K et le thème
+npm run demo          # la version de démo : reset + build de production + serveur sur toutes les interfaces
 codex                 # /skills doit lister kickoff, art-direction, workflow-screens…
 ```
 
@@ -171,6 +176,7 @@ Pièges rencontrés :
 | `npm run verify` | check + build : la porte finale |
 | `npm run invariants` | `scripts/check-invariants.ts` : tente chaque cas interdit sur une copie de la base |
 | `npm run e2e` | Playwright sur une base réinitialisée et un build de prod : chaque page se charge sans erreur, **chaque élément cliquable de chaque page fait quelque chose** (clic réel, sans survol ; aucun clic mort ni plusieurs barres d'un graphique vers la même cible), chaque parcours métier passe avec un cas refusé. Navigateur : `npx playwright install chromium` une fois. |
+| `npm run demo` | reset + build de production + `next start` sur toutes les interfaces (port 3000) : ce qu'on montre au jury. |
 
 **Après un `db:reset`, redémarrer le serveur** : `db:reset` supprime le fichier que le serveur garde ouvert, qui
 afficherait sinon une base orpheline.

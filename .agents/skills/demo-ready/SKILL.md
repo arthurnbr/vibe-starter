@@ -18,8 +18,10 @@ description: >-
 4. `npm run e2e`: all green. It resets the DB, builds, and runs on its own port, so it tests exactly what is demoed:
    every page loads without console error, **every clickable element on every page does something** (no dead or
    misrouted click), and every workflow journey passes. A red click audit is a demo bug: fix it, never skip it.
-5. Stop the dev server → `npm run db:reset` → start it again; take a last look at the landing page and the main
-   workflow at the current time of day ("today", "late", "full" depend on now).
+5. Stop the dev server, then `npm run demo` (reset + production build + `next start` on all interfaces): **demo the
+   production build**, not `next dev`. Open it once **from another device or the machine's network IP**, not only
+   localhost, and click a button and a chart bar: the page must react. Look at the landing page and the main workflow
+   at the current time of day ("today", "late", "full" depend on now).
 6. `npm run verify` as the very last command. If anything changes after it, run 3–6 again.
 7. Commit. Stop every server you started.
 

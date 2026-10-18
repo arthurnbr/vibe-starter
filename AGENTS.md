@@ -46,6 +46,10 @@ See `kickoff`, `art-direction`, `workflow-screens`. Quality comes from the hard 
 | `npm run verify` | check + production build: the final gate |
 | `npm run e2e` | Playwright on a fresh reset + production build: every page loads, **no dead click on any page**, each workflow journey passes (~1 min) |
 | `npm run invariants` | `scripts/check-invariants.ts`: forbidden cases against the real write code + global DB assertions |
+| `npm run demo` | reset + production build + `next start` on all interfaces (port 3000): what the candidate demos |
+
+Remote access: `next.config.ts` sets `allowedDevOrigins` to this machine's IPs. Without it, opening `next dev` from
+another device (LAN, Tailscale, phone) shows the page but blocks its scripts: **nothing reacts**. Do not remove it.
 
 SQLite gotcha: `db:reset` deletes the file a running dev server holds open. **After any reset, restart the dev server**
 before looking at the app, or it shows an orphaned database.
