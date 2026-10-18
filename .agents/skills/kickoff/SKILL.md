@@ -67,7 +67,8 @@ domain object shown · what the app computes/decides · primary action · conseq
 ## Art direction
 ## Seed plan
 ## Demo storyline (the new day)
-## Rejected ideas (and why)
+## Phase 2 (built if time remains — never "rejected for time")
+## Rejected ideas (only for product reasons, never "not enough time")
 ```
 
 Do not wait for approval: write SPEC.md, apply art direction, then build workflows.

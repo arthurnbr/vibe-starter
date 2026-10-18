@@ -24,6 +24,10 @@ See `kickoff`, `art-direction`, `workflow-screens`. Quality comes from the hard 
   Aim for 4–5 workflows; each has a before → after line in SPEC.md.
 - Use subagents/parallel work for independent slices when available (one owner per file).
 - `npm run check` after each slice; commit after each slice so a broken step never costs the demo.
+- **Use the time.** Runs with this starter finish the whole brief in 10–14 min. Never reject an idea "for time"
+  in SPEC.md; order it in phase 2. When the brief is covered and committed and more than 10 min remain, build the
+  next phase-2 workflow (customer-facing page, implied document, the app deciding more). Stop starting new slices
+  only when < 8 min remain, then run `demo-ready`.
 - At the end, stop any dev server you started and leave `npm run db:reset` state in place (the demo restarts the server).
 
 ## Commands
