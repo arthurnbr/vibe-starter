@@ -138,7 +138,7 @@ Prérequis : **Node.js 22** (`.nvmrc`, `engines`; `better-sqlite3` 13 l'exige), 
 Codex CLI (`npm i -g @openai/codex`) ou un autre agent qui lit `AGENTS.md` et `.agents/skills`.
 
 ```bash
-git clone <ce-repo> mon-epreuve && cd mon-epreuve
+git clone https://github.com/arthurnbr/vibe-starter.git mon-epreuve && cd mon-epreuve
 npm ci                # versions verrouillées : le seul chemin reproductible
 npm run db:reset      # crée data/app.db et injecte les données de démo
 npm run verify        # typecheck + lint + build de production
@@ -222,5 +222,5 @@ c'est la meilleure réponse à « usage critique de l'IA ».
 
 ## S'entraîner
 
-`subjects/` : cloner (`git clone vibe-starter essai-1`), chrono 40 min, ne pas regarder de solution. Changer de sujet entre deux essais.
+`subjects/` : cloner (`git clone https://github.com/arthurnbr/vibe-starter.git essai-1`), chrono 40 min, ne pas regarder de solution. Changer de sujet entre deux essais.
 Après chaque essai, ajouter à `AGENTS.md` ou à `workflow-screens` ce qui a manqué ou ce que l'agent a raté deux fois.

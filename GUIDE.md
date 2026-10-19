@@ -175,5 +175,5 @@ de vérifications longues que l'agent relance.
 - **Un starter préparé n'est pas forcément autorisé.** Selon l'épreuve, seule la méthode resterait utilisable.
 - **L'épreuve réelle peut être différente** : autre format, autres attentes, interaction avec l'examinateur.
 
-Le repo complet (starter, sujets d'entraînement, détail de chaque essai dans le `README.md`) est disponible si ça
-peut servir.
+Le repo complet (starter, sujets d'entraînement, détail de chaque essai dans le `README.md`) est ici, si ça peut
+servir : https://github.com/arthurnbr/vibe-starter
