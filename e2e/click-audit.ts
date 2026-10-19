@@ -80,7 +80,9 @@ export async function auditClicks(page: Page, path: string, opts: { skip?: RegEx
     await el.scrollIntoViewIfNeeded()
     const box = await el.boundingBox()
     if (!box) continue
-    const before = { url: page.url(), html: await page.locator("body").innerHTML() }
+    // Form state lives in properties, not in the HTML: checking a radio or a box changes nothing in innerHTML.
+    const formState = () => page.locator("input, select, textarea").evaluateAll((ns) => ns.map((n) => (n as HTMLInputElement).checked + "|" + (n as HTMLInputElement).value).join(","))
+    const before = { url: page.url(), html: await page.locator("body").innerHTML(), form: await formState() }
     // A link opening a new tab is alive if the tab opens: count popups for this click.
     let popup = false
     const onPopup = () => (popup = true)
@@ -94,7 +96,7 @@ export async function auditClicks(page: Page, path: string, opts: { skip?: RegEx
       continue
     }
     const overlay = await page.locator("[role=dialog], [role=alertdialog], [role=menu], [role=listbox], [data-sonner-toast]").count()
-    const changed = page.url() !== before.url || overlay > 0 || (await page.locator("body").innerHTML()) !== before.html
+    const changed = page.url() !== before.url || overlay > 0 || (await page.locator("body").innerHTML()) !== before.html || (await formState()) !== before.form
     const outcome = { label, effect: page.url() !== before.url ? `→ ${new URL(page.url()).pathname}${new URL(page.url()).search}` : overlay ? "overlay" : changed ? "dom" : "NOTHING" }
     ;(changed ? ok : dead).push(outcome)
     if (group && outcome.effect.startsWith("→")) (destinations[group] ??= []).push(outcome)
@@ -107,6 +109,8 @@ export async function auditClicks(page: Page, path: string, opts: { skip?: RegEx
   const fake = await page.evaluate((selector) => {
     const real = new Set(document.querySelectorAll(selector))
     return [...document.querySelectorAll("main *")]
+      // A <label> wrapping (or pointing at) an input is a control: clicking it checks the input.
+      .filter((n) => !(n.closest("label") && (n.closest("label")!.control || n.closest("label")!.querySelector("input, select, textarea"))))
       .filter((n) => getComputedStyle(n).cursor === "pointer" && ![...real].some((r) => r === n || r.contains(n) || n.contains(r)))
       .map((n) => (n as HTMLElement).innerText?.trim().slice(0, 60) || n.tagName)
   }, CLICKABLE)

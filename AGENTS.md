@@ -29,7 +29,8 @@ See `kickoff`, `art-direction`, `workflow-screens`. Quality comes from the hard 
 | 32–40 | Demo | The candidate demos. The agent is idle. |
 
 **The clock is the hard limit.** A run that is correct at minute 52 fails the interview. Check the time (`date`)
-at each commit; at minute 28 freeze whatever is done.
+at each commit; at minute 28 freeze whatever is done. Reserve 2 minutes at the end to rerun each test you fixed
+after the full e2e (`-g`, one command): never hand over a fix nobody ran.
 
 - After the go, work autonomously: decide, note the assumption in `SPEC.md`, keep going.
 - Deferring a bonus is a legitimate decision; write it in SPEC "Phase 2" with the reason. Do not drop brief lines.

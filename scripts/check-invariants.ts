@@ -1,16 +1,14 @@
-// Proof script: tries each forbidden case against a throwaway copy of the DB and prints PASS/FAIL.
-// Run: npx tsx scripts/check-invariants.ts   (replace the cases with the real domain's invariants)
-import { copyFileSync, rmSync } from "node:fs"
-import Database from "better-sqlite3"
+// Proof script: tries each forbidden case and prints PASS/FAIL. Replace the cases with the real domain's invariants.
+// `npm run invariants` copies data/app.db to /tmp and sets DB_FILE: import `db` from "../src/db" and the write
+// functions from `write.ts` as the server actions do; they all hit the copy. The demo DB is never touched, so the
+// script gives the same result every time it runs.
 import { eq } from "drizzle-orm"
-import { drizzle } from "drizzle-orm/better-sqlite3"
+import { db } from "../src/db"
 import { tasks } from "../src/db/schema"
 import { taskBatchInput } from "../src/features/tasks/batch"
 import { taskInput } from "../src/features/tasks/validation"
 
-const copy = "/tmp/check-invariants.db"
-copyFileSync("data/app.db", copy)
-const db = drizzle(new Database(copy))
+if (!process.env.DB_FILE) throw new Error("Run through `npm run invariants` (works on a copy of the DB)")
 let failed = 0
 
 function expect(name: string, rejected: boolean) {
@@ -44,6 +42,5 @@ expect(
 )
 expect("update d'une ligne disparue: 0 changement détecté", db.update(tasks).set({ title: "x" }).where(eq(tasks.id, -1)).run().changes === 0)
 
-rmSync(copy)
 console.log(failed ? `\n${failed} invariant(s) NON garanti(s)` : "\nTous les invariants tiennent")
 process.exit(failed ? 1 : 0)

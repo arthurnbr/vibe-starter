@@ -71,9 +71,11 @@ records" (catalogue, analytics, audit), a good table with search, sort and inlin
 - Inline consequences before submit (stock after, price change impact), not only server errors after.
 - **A disabled submit says why**, next to the button ("Téléphone : 10 chiffres", "Choisir au moins un outil").
   Live previews apply the server's bounds (no negative amount shown as a refund, no date past the max).
-- **French input**: number fields are text inputs with `inputMode="decimal"` (a `type="number"` field turns "2,5"
-  into 25 in a non-French browser) parsed by `frenchNumber` (`src/lib/text.ts`); every message is French (import
-  zod from `@/lib/zod`, which sets the French locale).
+- **French input and output**: number fields are text inputs with `inputMode="decimal"`, never `type="number"`
+  (in a non-French browser "10,5" silently becomes 105), parsed by `frenchNumber` (`src/lib/text.ts`); numbers
+  shown with `formatNumber`/`formatCurrency` ("5,5 h"); every message is French (import zod from `@/lib/zod`).
+- **Statuses follow time**: a future day shows "Attendu", not "Absent"; past, today and future each get their wording.
+- **Global search lists one line per thing** (one person, not one per booking), with a hint to its latest record.
 - Undo for destructive or bulk actions via toast with a compensating server action.
 
 ### 7. Real-life completeness (what users hit on day 2)

@@ -9,11 +9,14 @@ import { Input } from "@/components/ui/input"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
 import { Table, TableBody, TableCell, TableFooter, TableHead, TableHeader, TableRow } from "@/components/ui/table"
 import { TASK_PRIORITIES, type Task } from "@/db/schema"
+import { formatNumber } from "@/lib/format"
+import { frenchNumber } from "@/lib/text"
 import { createTasksBatch } from "./batch-actions"
 import { MAX_BATCH_LINES, type BatchState } from "./batch"
 import { priorityLabel } from "./labels"
 
-type Line = { key: number; title: string; priority: Task["priority"]; estimateHours: number }
+// estimateHours keeps what the user typed ("1,5"): the server parses it with frenchNumber and says if it is wrong.
+type Line = { key: number; title: string; priority: Task["priority"]; estimateHours: string }
 
 // Reference batch-entry screen: type → Enter adds a line and refocuses, live totals, one submit, per-line errors.
 export function TaskBatchSheet() {
@@ -30,7 +33,7 @@ export function TaskBatchSheet() {
   const add = () => {
     const title = draft.trim()
     if (!title || lines.length >= MAX_BATCH_LINES) return
-    setLines((current) => [...current, { key: nextKey.current++, title, priority: "medium", estimateHours: 1 }])
+    setLines((current) => [...current, { key: nextKey.current++, title, priority: "medium", estimateHours: "1" }])
     setDraft("")
     input.current?.focus()
   }
@@ -52,7 +55,7 @@ export function TaskBatchSheet() {
     })
   }
 
-  const totalHours = lines.reduce((sum, line) => sum + line.estimateHours, 0)
+  const totalHours = lines.reduce((sum, line) => sum + (Number(frenchNumber(line.estimateHours)) || 0), 0)
   return (
     // fieldset disabled locks every input while saving, so nothing typed during the request is silently lost.
     <fieldset disabled={pending} className="flex flex-col gap-4">
@@ -101,7 +104,7 @@ export function TaskBatchSheet() {
                   </Select>
                 </TableCell>
                 <TableCell>
-                  <Input type="number" min={1} value={line.estimateHours} onChange={(e) => update(line.key, { estimateHours: Number(e.target.value) })} aria-invalid={!!errors[line.key]?.estimateHours} />
+                  <Input inputMode="decimal" value={line.estimateHours} onChange={(e) => update(line.key, { estimateHours: e.target.value })} aria-invalid={!!errors[line.key]?.estimateHours} />
                   {errors[line.key]?.estimateHours && <p className="mt-1 text-xs text-destructive">{errors[line.key].estimateHours}</p>}
                 </TableCell>
                 <TableCell>
@@ -116,7 +119,7 @@ export function TaskBatchSheet() {
             <TableRow>
               <TableCell>{lines.length} / {MAX_BATCH_LINES} ligne(s)</TableCell>
               <TableCell />
-              <TableCell className="tabular-nums">{totalHours} h</TableCell>
+              <TableCell className="tabular-nums">{formatNumber(totalHours)} h</TableCell>
               <TableCell />
             </TableRow>
           </TableFooter>

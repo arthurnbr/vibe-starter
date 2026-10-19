@@ -13,7 +13,7 @@
     "db:reset": "rm -rf data && mkdir -p data && npm run db:push && npm run db:seed",
     "check": "npm run typecheck && npm run lint",
     "verify": "npm run check && next build",
-    "invariants": "tsx scripts/check-invariants.ts",
+    "invariants": "cp data/app.db /tmp/invariants.db && DB_FILE=/tmp/invariants.db NODE_OPTIONS=--conditions=react-server tsx scripts/check-invariants.ts",
     "e2e": "playwright test",
     "demo": "npm run db:reset && next build && next start -H 0.0.0.0"
   },

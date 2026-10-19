@@ -55,7 +55,8 @@ description: >-
 - **Public URLs** (QR, SMS, tracking links) come from one `publicUrl()` reading `PUBLIC_URL`, never from the `Host` header.
 
 ## Verify (and keep the proof)
-Write `scripts/check-invariants.ts` that:
+Write `scripts/check-invariants.ts` (start from the template: `npm run invariants` runs it on a **copy** of the DB
+through `DB_FILE`, so it may write freely and gives the same result on every run; never point it at `data/app.db`) that:
 - calls **every write path** through the same function the server action uses (extract the transaction into a
   plain function in `write.ts`, call it from both the action and the script), not raw SQL;
 - tries each forbidden case (over capacity, off-by-seconds slot, reactivate/resume into a full day, undo after each
